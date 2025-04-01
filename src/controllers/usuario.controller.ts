@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {UserModel} from "../database/prismaClient"
 import {UsuarioSchema,UsuarioType} from "../schemas/Usuario.schema"
 import {handleErrorResponse } from "../utils/errorHandler"
+import { hashPassword } from "../utils/hashPassword";
 
 //buscar toda la lista de usuarios
 export const getUsuarios = async (req:Request, res:Response) => {
@@ -31,15 +32,43 @@ export const getUsuarioById = async (req:Request, res:Response) => {
 }
 export const createUsuario = async (req: Request, res: Response) => {
     try {
-        // Validar la entrada  aca usa type y zod
+        // Validar los datos con Zod
         const usuarioData: UsuarioType = UsuarioSchema.parse(req.body);
+
+        // Verificar si el email ya está registrado
+        const existingUser = await UserModel.findUnique({
+            where: { email: usuarioData.email },
+        });
+
+        if (existingUser) {
+            res.status(400).json({ error: "El email ya está registrado" });
+            return;
+        }
+
+        // Hashear la contraseña antes de guardarla
+        const hashedPassword = await hashPassword(usuarioData.contrasena);
 
         // Crear usuario en la base de datos
         const nuevoUsuario = await UserModel.create({
-            data: usuarioData,
+            data: {
+                ...usuarioData,
+                contrasena: hashedPassword, // Guardar la contraseña hasheada
+            },
         });
 
         res.status(201).json(nuevoUsuario);
+    } catch (error) {
+        handleErrorResponse(res, error);
+    }
+};
+
+export const deleteUsuario = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        await UserModel.delete({
+            where: { id: Number(id) },
+        });
+        res.status(204).send();
     } catch (error) {
         handleErrorResponse(res, error);
     }

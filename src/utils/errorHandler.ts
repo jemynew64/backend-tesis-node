@@ -1,7 +1,7 @@
 import { Response } from "express";
-export const handleErrorResponse = (res:Response, error:unknown) => {
+
+export const handleErrorResponse = (res: Response, error: unknown): Response => {
     console.error(error);
-    // Verifica si el error es una instancia de Error
-     const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
-     res.status(500).json({ error: errorMessage });
+    const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ error: errorMessage }); // ✅ Agregado return
 };

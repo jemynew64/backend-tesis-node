@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -17,13 +18,16 @@ async function main() {
       imagen_src: "comunicacion.png",
     },
   });
-
+  // Hashear contraseñas antes de guardarlas
+  const saltRounds = 10;
+  const hashedPassword1 = await bcrypt.hash("123456", saltRounds);
+  const hashedPassword2 = await bcrypt.hash("123456", saltRounds);
   // Crear los usuarios
   const usuario10 = await prisma.usuario.create({
     data: {
       nombre: "jemal",
       email: "jemal@ejemplo.com",
-      contrasena: "123456",
+      contrasena: hashedPassword1,
       imagen_perfil: "/default_user.png",
       tipo_usuario: "admin",
     },
@@ -33,7 +37,7 @@ async function main() {
     data: {
       nombre: "Juan Pérez",
       email: "juan@ejemplo.com",
-      contrasena: "123456",
+      contrasena: hashedPassword2,
       imagen_perfil: "/default_user.png",
     },
   });
