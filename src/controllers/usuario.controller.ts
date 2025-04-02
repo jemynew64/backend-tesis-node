@@ -1,18 +1,35 @@
 import { Request, Response } from "express";
 import {UserModel} from "../database/prismaClient"
-import {UsuarioSchema,UsuarioType} from "../schemas/Usuario.schema"
+import {UsuarioSchema,UsuarioType} from "../schemas/UsuarioSchema"
 import {handleErrorResponse } from "../utils/errorHandler"
 import { hashPassword } from "../utils/hashPassword";
 
 //buscar toda la lista de usuarios
-export const getUsuarios = async (req:Request, res:Response) => {
-    try{
-        const usuarios = await UserModel.findMany()
+// export const getUsuarios = async (req:Request, res:Response) => {
+//     try{
+//         const usuarios = await UserModel.findMany()
+//         res.status(200).json(usuarios);
+//     }catch(error){
+//         handleErrorResponse(res, error);
+//     }   
+// }
+export const getUsuarios = async (req: Request, res: Response) => {
+    try {
+        const page = Number(req.query.page) || 1;  // Página actual (por defecto 1)
+        const limit = Number(req.query.limit) || 10; // Usuarios por página (por defecto 10)
+
+        const usuarios = await UserModel.findMany({
+            where: { tipo_usuario: "estudiante" },
+            take: limit,  // Cantidad de usuarios por página
+            skip: (page - 1) * limit, // Cuántos usuarios saltar antes de empezar
+        });
+
         res.status(200).json(usuarios);
-    }catch(error){
+    } catch (error) {
         handleErrorResponse(res, error);
-    }   
-}
+    }
+};
+
 
 //buscar un usuario por id
 export const getUsuarioById = async (req:Request, res:Response) => {
@@ -23,7 +40,8 @@ export const getUsuarioById = async (req:Request, res:Response) => {
             where: { id: Number(id) },
         });
         if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
+            res.status(404).json({ message: "Usuario no encontrado" });
+            return;
         }
         res.status(200).json(usuario);
     }catch(error){
@@ -69,6 +87,40 @@ export const deleteUsuario = async (req: Request, res: Response) => {
             where: { id: Number(id) },
         });
         res.status(204).send();
+    } catch (error) {
+        handleErrorResponse(res, error);
+    }
+};
+
+export const updateUsuario = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        
+        // Validar los datos con Zod uso esto Partial<UsuarioType> para que la validacion sea opcional
+        const usuarioData: Partial<UsuarioType> = UsuarioSchema.partial().parse(req.body);
+        
+        // Verificar si el usuario existe
+        const existingUser = await UserModel.findUnique({
+            where: { id: Number(id) },
+        });
+        
+        if (!existingUser) {
+            res.status(404).json({ message: "Usuario no encontrado" });
+            return;
+        }
+        
+        // Si se está actualizando la contraseña, hay que hashearla
+        if (usuarioData.contrasena) {
+            usuarioData.contrasena = await hashPassword(usuarioData.contrasena);
+        }
+        
+        // Actualizar usuario en la base de datos
+        const usuarioActualizado = await UserModel.update({
+            where: { id: Number(id) },
+            data: usuarioData,
+        });
+        
+        res.status(200).json(usuarioActualizado);
     } catch (error) {
         handleErrorResponse(res, error);
     }

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 //* Generate jwt token
 export const generateToken = (payload:any) =>{
     const secret = process.env.JWT_SECRET || 'defaultSecret';
-    const options: jwt.SignOptions = { expiresIn: 6 * 60 * 60 }; // 6 horas
+    const options: jwt.SignOptions = { expiresIn: 7 * 24 * 60 * 60 }; // 7 días en segundos
     return jwt.sign(payload, secret, options);
 }
 
