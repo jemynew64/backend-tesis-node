@@ -4,15 +4,6 @@ import {UsuarioSchema,UsuarioType} from "../schemas/UsuarioSchema"
 import {handleErrorResponse } from "../utils/errorHandler"
 import { hashPassword } from "../utils/hashPassword";
 
-//buscar toda la lista de usuarios
-// export const getUsuarios = async (req:Request, res:Response) => {
-//     try{
-//         const usuarios = await UserModel.findMany()
-//         res.status(200).json(usuarios);
-//     }catch(error){
-//         handleErrorResponse(res, error);
-//     }   
-// }
 export const getUsuarios = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;  // Página actual (por defecto 1)
@@ -86,7 +77,10 @@ export const deleteUsuario = async (req: Request, res: Response) => {
         await UserModel.delete({
             where: { id: Number(id) },
         });
-        res.status(204).send();
+        // Cambiado a 200 OK con mensaje de confirmación
+        res.status(200).json({ 
+            message: "Usuario eliminado correctamente",
+                });
     } catch (error) {
         handleErrorResponse(res, error);
     }
