@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import {UserModel} from "../database/prismaClient"
+import {UserModel,Progreso_usuarioModel} from "../database/prismaClient"
 import {UsuarioSchema,UsuarioType} from "../schemas/UsuarioSchema"
 import {handleErrorResponse } from "../utils/errorHandler"
 import { hashPassword } from "../utils/hashPassword";
+import { connect } from "node:http2";
 
 export const getUsuarios = async (req: Request, res: Response) => {
     try {
@@ -51,7 +52,7 @@ export const createUsuario = async (req: Request, res: Response) => {
 
         if (existingUser) {
             res.status(400).json({ error: "El email ya está registrado" });
-            return;
+            return ;
         }
 
         // Hashear la contraseña antes de guardarla
@@ -64,7 +65,37 @@ export const createUsuario = async (req: Request, res: Response) => {
                 contrasena: hashedPassword, // Guardar la contraseña hasheada
             },
         });
+        //añadiendo al usuario tanto en comunicacion como en matematicas xd
+        const matematicasid = 1
+        const comunicacionid = 2
+        await Progreso_usuarioModel.create({
+            data: {
+                usuario_id: nuevoUsuario.id,
+                curso_activo_id: matematicasid
+            },
+        })
+        await Progreso_usuarioModel.create({
+            data: {
+                usuario_id: nuevoUsuario.id,
+                curso_activo_id: comunicacionid
+            },
+        })
 
+        // await Progreso_usuarioModel.create({
+        //     data: {
+        //         usuario: {
+        //             connect: {
+        //                 id: nuevoUsuario.id,
+        //             },
+        //         },
+        //         curso: {
+        //             connect: {
+        //                 id: matematicasid,
+        //             },
+        //         },
+        //     },
+        // });
+        
         res.status(201).json(nuevoUsuario);
     } catch (error) {
         handleErrorResponse(res, error);

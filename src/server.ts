@@ -5,7 +5,10 @@ import authRoutes from "./routes/auth.routes"
 import cursosRoutes from "./routes/curso.routes"
 import unidadesRoutes from "./routes/unidad.routes"
 import leccionRoutes from "./routes/leccion.route"
-
+import logroRoutes from "./routes/logro.routes"
+import retoRoutes from "./routes/reto.routes"
+import logroObtenidoRoutes from "./routes/logroObtenido.route"
+import opcionRetoRoutes from "./routes/opcionReto.route"
 const app = express();
 app.use(
   cors({
@@ -22,8 +25,12 @@ app.use(express.json());
  app.use("/api/cursos",cursosRoutes );
  app.use("/api/unidades",unidadesRoutes );
  app.use("/api/lecciones",leccionRoutes );
+ app.use("/api/logros",logroRoutes );
+ app.use("/api/logroObtenido",logroObtenidoRoutes );
+ app.use("/api/opcionReto",opcionRetoRoutes );
+ app.use("/api/reto",retoRoutes );
  app.use("/api/auth", authRoutes);
-
+ 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

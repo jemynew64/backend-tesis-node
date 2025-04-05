@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LeccionModel, UnidadModel } from "../database/prismaClient";
+import { LeccionModel } from "../database/prismaClient";
 import { LeccionSchema, LeccionType } from "../schemas/index";
 import { handleErrorResponse } from "../utils/errorHandler";
 
