@@ -12,3 +12,6 @@ export const LogroObtenidoModel = prisma.logro_obtenido;
 export const Progreso_retoModel = prisma.progreso_reto;
 export const Progreso_usuarioModel = prisma.progreso_usuario;
 export const OpcionRetoModel = prisma.opcion_reto;
+//añadido
+export const MisionModel = prisma.mision;
+export const MisionUsuarioModel = prisma.mision_usuario;

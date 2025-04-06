@@ -9,6 +9,8 @@ import logroRoutes from "./routes/logro.routes"
 import retoRoutes from "./routes/reto.routes"
 import logroObtenidoRoutes from "./routes/logroObtenido.route"
 import opcionRetoRoutes from "./routes/opcionReto.route"
+import misionRoutes from "./routes/mision.routes"
+import misionUsuarioRoutes from "./routes/misionUsuario.routes"
 const app = express();
 app.use(
   cors({
@@ -20,7 +22,9 @@ app.use(
 
 app.use(express.json());
 
-// Routes
+// Routes 9 echas
+ app.use("/api/misiones",misionRoutes );
+ app.use("/api/misionUsuarios", misionUsuarioRoutes);
  app.use("/api/usuarios",usersRoutes );
  app.use("/api/cursos",cursosRoutes );
  app.use("/api/unidades",unidadesRoutes );

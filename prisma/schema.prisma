@@ -16,12 +16,13 @@ model curso {
 }
 
 model leccion {
-  id        Int    @id @default(autoincrement())
-  titulo    String @db.VarChar(255)
-  orden     Int
-  unidad_id Int
-  unidad    unidad @relation(fields: [unidad_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  reto      reto[]
+  id               Int                @id @default(autoincrement())
+  titulo           String             @db.VarChar(255)
+  orden            Int
+  unidad_id        Int
+  unidad           unidad             @relation(fields: [unidad_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  progreso_leccion progreso_leccion[]
+  reto             reto[]
 
   @@index([unidad_id], map: "idx_leccion_unidad")
 }
@@ -113,14 +114,49 @@ model usuario {
   nombre           String             @db.VarChar(255)
   email            String             @unique @db.VarChar(254)
   contrasena       String             @db.VarChar(255)
-  fecha_creacion   DateTime?           @default(now()) @db.Timestamp(6)
-  imagen_perfil    String?            @default("/default_user.png") @db.VarChar(255)  
-  corazones        Int?                @default(5)
-  puntos           Int?                @default(0)
-  experiencia      Int?                @default(0)
-  nivel            Int?                @default(1)
+  fecha_creacion   DateTime           @default(now()) @db.Timestamp(6)
+  imagen_perfil    String             @default("/default_user.png") @db.VarChar(255)
+  corazones        Int                @default(5)
+  puntos           Int                @default(0)
+  experiencia      Int                @default(0)
+  nivel            Int                @default(1)
   tipo_usuario     String             @default("estudiante") @db.VarChar(10)
   logro_obtenido   logro_obtenido[]
+  mision_usuario   mision_usuario[]
+  progreso_leccion progreso_leccion[]
   progreso_reto    progreso_reto[]
   progreso_usuario progreso_usuario[]
+}
+
+model mision {
+  id                   Int              @id @default(autoincrement())
+  titulo               String           @db.VarChar(255)
+  descripcion          String
+  experiencia_otorgada Int              @default(0)
+  mision_usuario       mision_usuario[]
+}
+
+model mision_usuario {
+  id               Int       @id @default(autoincrement())
+  usuario_id       Int
+  mision_id        Int
+  completado       Boolean   @default(false)
+  fecha_completado DateTime? @db.Timestamp(6)
+  mision           mision    @relation(fields: [mision_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario          usuario   @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([mision_id], map: "idx_mision_usuario_mision")
+  @@index([usuario_id], map: "idx_mision_usuario_usuario")
+}
+
+model progreso_leccion {
+  id         Int     @id @default(autoincrement())
+  usuario_id Int
+  leccion_id Int
+  completado Boolean @default(false)
+  leccion    leccion @relation(fields: [leccion_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario    usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([leccion_id], map: "idx_progreso_leccion_leccion")
+  @@index([usuario_id], map: "idx_progreso_leccion_usuario")
 }

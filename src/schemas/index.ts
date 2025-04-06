@@ -8,3 +8,5 @@ export * from "./ProgresoUsuarioSchema";
 export * from "./RetoSchema";
 export * from "./UnidadSchema";
 export * from "./UsuarioSchema";
+export * from "./MisionSchema";
+export * from "./MisionUsuarioSchema";
