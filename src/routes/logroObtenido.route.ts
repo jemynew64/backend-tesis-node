@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createLogroObtenido,deleteLogroObtenido,getLogroObtenidoById,getLogroObtenidoObtenido,updateLogroObtenido } from "../controllers/logro.optenido.controller";
+import { createLogroObtenido,deleteLogroObtenido,getLogroObtenidoById,getLogroObtenidoObtenido,updateLogroObtenido } from "../controllers/logro.obtenido.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 
 

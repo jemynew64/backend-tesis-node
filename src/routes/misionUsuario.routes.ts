@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createMisionUsuario,deleteMisionUsuario,getMisionUsuario,getMisionUsuarioById,updateMisionUsuario } from "../controllers/MisionUsuario.controller";
+import { createMisionUsuario,deleteMisionUsuario,getMisionUsuario,getMisionUsuarioById,updateMisionUsuario } from "../controllers/mision.usuario.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 
 

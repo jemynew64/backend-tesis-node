@@ -10,3 +10,4 @@ export * from "./UnidadSchema";
 export * from "./UsuarioSchema";
 export * from "./MisionSchema";
 export * from "./MisionUsuarioSchema";
+export * from "./ProgresoLeccionSchema";
