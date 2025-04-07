@@ -4,215 +4,217 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Crear los cursos
-  const cursoMatematicas = await prisma.curso.create({
+  // Create Courses
+  const mathCourse = await prisma.course.create({
     data: {
-      titulo: "Matemáticas",
-      imagen_src: "matematicas.png",
+      title: "Matemáticas",
+      image_src: "matematicas.png",
     },
   });
 
-  const cursoComunicacion = await prisma.curso.create({
+  const communicationCourse = await prisma.course.create({
     data: {
-      titulo: "Comunicación",
-      imagen_src: "comunicacion.png",
+      title: "Comunicación",
+      image_src: "comunicacion.png",
     },
   });
-  // Hashear contraseñas antes de guardarlas
+
+  // Hash passwords
   const saltRounds = 10;
   const hashedPassword1 = await bcrypt.hash("123456", saltRounds);
   const hashedPassword2 = await bcrypt.hash("123456", saltRounds);
-  // Crear los usuarios
-  const usuario10 = await prisma.usuario.create({
+
+  // Create Users
+  const adminUser = await prisma.user_account.create({
     data: {
-      nombre: "jemal",
+      name: "jemal",
       email: "jemal@ejemplo.com",
-      contrasena: hashedPassword1,
-      imagen_perfil: "/default_user.png",
-      tipo_usuario: "admin",
+      password: hashedPassword1,
+      profile_image: "/default_user.png",
+      user_type: "admin",
     },
   });
 
-  const usuario1 = await prisma.usuario.create({
+  const regularUser = await prisma.user_account.create({
     data: {
-      nombre: "Juan Pérez",
+      name: "Juan Pérez",
       email: "juan@ejemplo.com",
-      contrasena: hashedPassword2,
-      imagen_perfil: "/default_user.png",
+      password: hashedPassword2,
+      profile_image: "/default_user.png",
     },
   });
 
-  // Crear Unidades para Matemáticas
-  const unidadMatematicas1 = await prisma.unidad.create({
+  // Create Math Units
+  const mathUnit1 = await prisma.unit.create({
     data: {
-      titulo: "Suma y Resta",
-      descripcion: "Aprende a sumar y restar números.",
-      curso_id: cursoMatematicas.id,
-      orden: 1,
+      title: "Suma y Resta",
+      description: "Aprende a sumar y restar números.",
+      course_id: mathCourse.id,
+      order_num: 1,
     },
   });
 
-  const unidadMatematicas2 = await prisma.unidad.create({
+  const mathUnit2 = await prisma.unit.create({
     data: {
-      titulo: "Multiplicación",
-      descripcion: "Aprende a multiplicar números.",
-      curso_id: cursoMatematicas.id,
-      orden: 2,
+      title: "Multiplicación",
+      description: "Aprende a multiplicar números.",
+      course_id: mathCourse.id,
+      order_num: 2,
     },
   });
 
-  // Crear Unidades para Comunicación
-  const unidadComunicacion1 = await prisma.unidad.create({
+  // Create Communication Units
+  const communicationUnit1 = await prisma.unit.create({
     data: {
-      titulo: "Lectura de Cuentos",
-      descripcion: "Lee cuentos y aprende vocabulario.",
-      curso_id: cursoComunicacion.id,
-      orden: 1,
+      title: "Lectura de Cuentos",
+      description: "Lee cuentos y aprende vocabulario.",
+      course_id: communicationCourse.id,
+      order_num: 1,
     },
   });
 
-  const unidadComunicacion2 = await prisma.unidad.create({
+  const communicationUnit2 = await prisma.unit.create({
     data: {
-      titulo: "Escritura Creativa",
-      descripcion: "Escribe tus propios cuentos.",
-      curso_id: cursoComunicacion.id,
-      orden: 2,
+      title: "Escritura Creativa",
+      description: "Escribe tus propios cuentos.",
+      course_id: communicationCourse.id,
+      order_num: 2,
     },
   });
 
-  // Crear Lecciones de Matemáticas
-  const leccionMatematicas1 = await prisma.leccion.create({
+  // Create Math Lessons
+  const mathLesson1 = await prisma.lesson.create({
     data: {
-      titulo: "Suma de Números",
-      unidad_id: unidadMatematicas1.id,
-      orden: 1,
+      title: "Suma de Números",
+      unit_id: mathUnit1.id,
+      order_num: 1,
     },
   });
 
-  const leccionMatematicas2 = await prisma.leccion.create({
+  const mathLesson2 = await prisma.lesson.create({
     data: {
-      titulo: "Resta de Números",
-      unidad_id: unidadMatematicas1.id,
-      orden: 2,
+      title: "Resta de Números",
+      unit_id: mathUnit1.id,
+      order_num: 2,
     },
   });
 
-  const leccionMatematicas3 = await prisma.leccion.create({
+  const mathLesson3 = await prisma.lesson.create({
     data: {
-      titulo: "Multiplicación de Números",
-      unidad_id: unidadMatematicas2.id,
-      orden: 1,
+      title: "Multiplicación de Números",
+      unit_id: mathUnit2.id,
+      order_num: 1,
     },
   });
 
-  // Crear Lecciones de Comunicación
-  const leccionComunicacion1 = await prisma.leccion.create({
+  // Create Communication Lessons
+  const communicationLesson1 = await prisma.lesson.create({
     data: {
-      titulo: "Responde preguntas sobre el cuento: La tortuga y la liebre",
-      unidad_id: unidadComunicacion1.id,
-      orden: 1,
+      title: "Responde preguntas sobre el cuento: La tortuga y la liebre",
+      unit_id: communicationUnit1.id,
+      order_num: 1,
     },
   });
 
-  const leccionComunicacion2 = await prisma.leccion.create({
+  const communicationLesson2 = await prisma.lesson.create({
     data: {
-      titulo: "Escribe y responde preguntas sobre tu propio cuento",
-      unidad_id: unidadComunicacion2.id,
-      orden: 1,
+      title: "Escribe y responde preguntas sobre tu propio cuento",
+      unit_id: communicationUnit2.id,
+      order_num: 1,
     },
   });
 
-  // Crear Retos de Matemáticas: Suma
-  const retoSuma1 = await prisma.reto.create({
+  // Math Challenges: Addition
+  const additionChallenge1 = await prisma.challenge.create({
     data: {
-      leccion_id: leccionMatematicas1.id,
-      tipo: "SELECCIONAR",
-      pregunta: "¿Cuánto es 7 + 5?",
-      orden: 1,
+      lesson_id: mathLesson1.id,
+      type: "SELECCIONAR",
+      question: "¿Cuánto es 7 + 5?",
+      order_num: 1,
     },
   });
 
-  await prisma.opcion_reto.createMany({
+  await prisma.challenge_option.createMany({
     data: [
-      { reto_id: retoSuma1.id, texto: "12", correcto: true },
-      { reto_id: retoSuma1.id, texto: "13", correcto: false },
-      { reto_id: retoSuma1.id, texto: "11", correcto: false },
+      { challenge_id: additionChallenge1.id, text: "12", is_correct: true },
+      { challenge_id: additionChallenge1.id, text: "13", is_correct: false },
+      { challenge_id: additionChallenge1.id, text: "11", is_correct: false },
     ],
   });
 
-  const retoSuma2 = await prisma.reto.create({
+  const additionChallenge2 = await prisma.challenge.create({
     data: {
-      leccion_id: leccionMatematicas1.id,
-      tipo: "SELECCIONAR",
-      pregunta: "¿Cuánto es 15 + 8?",
-      orden: 2,
+      lesson_id: mathLesson1.id,
+      type: "SELECCIONAR",
+      question: "¿Cuánto es 15 + 8?",
+      order_num: 2,
     },
   });
 
-  await prisma.opcion_reto.createMany({
+  await prisma.challenge_option.createMany({
     data: [
-      { reto_id: retoSuma2.id, texto: "23", correcto: true },
-      { reto_id: retoSuma2.id, texto: "22", correcto: false },
-      { reto_id: retoSuma2.id, texto: "21", correcto: false },
+      { challenge_id: additionChallenge2.id, text: "23", is_correct: true },
+      { challenge_id: additionChallenge2.id, text: "22", is_correct: false },
+      { challenge_id: additionChallenge2.id, text: "21", is_correct: false },
     ],
   });
 
-  // Reto de Resta
-  const retoResta1 = await prisma.reto.create({
+  // Subtraction Challenge
+  const subtractionChallenge = await prisma.challenge.create({
     data: {
-      leccion_id: leccionMatematicas2.id,
-      tipo: "SELECCIONAR",
-      pregunta: "¿Cuánto es 9 - 4?",
-      orden: 1,
+      lesson_id: mathLesson2.id,
+      type: "SELECCIONAR",
+      question: "¿Cuánto es 9 - 4?",
+      order_num: 1,
     },
   });
 
-  await prisma.opcion_reto.createMany({
+  await prisma.challenge_option.createMany({
     data: [
-      { reto_id: retoResta1.id, texto: "5", correcto: true },
-      { reto_id: retoResta1.id, texto: "6", correcto: false },
-      { reto_id: retoResta1.id, texto: "4", correcto: false },
+      { challenge_id: subtractionChallenge.id, text: "5", is_correct: true },
+      { challenge_id: subtractionChallenge.id, text: "6", is_correct: false },
+      { challenge_id: subtractionChallenge.id, text: "4", is_correct: false },
     ],
   });
 
-  // Reto de Multiplicación
-  const retoMultiplicacion1 = await prisma.reto.create({
+  // Multiplication Challenge
+  const multiplicationChallenge = await prisma.challenge.create({
     data: {
-      leccion_id: leccionMatematicas3.id,
-      tipo: "SELECCIONAR",
-      pregunta: "¿Cuánto es 6 x 4?",
-      orden: 1,
+      lesson_id: mathLesson3.id,
+      type: "SELECCIONAR",
+      question: "¿Cuánto es 6 x 4?",
+      order_num: 1,
     },
   });
 
-  await prisma.opcion_reto.createMany({
+  await prisma.challenge_option.createMany({
     data: [
-      { reto_id: retoMultiplicacion1.id, texto: "24", correcto: true },
-      { reto_id: retoMultiplicacion1.id, texto: "20", correcto: false },
-      { reto_id: retoMultiplicacion1.id, texto: "22", correcto: false },
+      { challenge_id: multiplicationChallenge.id, text: "24", is_correct: true },
+      { challenge_id: multiplicationChallenge.id, text: "20", is_correct: false },
+      { challenge_id: multiplicationChallenge.id, text: "22", is_correct: false },
     ],
   });
 
-  // Crear Retos de Comunicación
-  const retoComunicacion1 = await prisma.reto.create({
+  // Communication Challenges
+  const communicationChallenge1 = await prisma.challenge.create({
     data: {
-      leccion_id: leccionComunicacion1.id,
-      tipo: "ESCRIBIR",
-      pregunta: "¿Qué sucedió al final del cuento 'La tortuga y la liebre'?",
-      orden: 1,
+      lesson_id: communicationLesson1.id,
+      type: "ESCRIBIR",
+      question: "¿Qué sucedió al final del cuento 'La tortuga y la liebre'?",
+      order_num: 1,
     },
   });
 
-  const retoComunicacion2 = await prisma.reto.create({
+  const communicationChallenge2 = await prisma.challenge.create({
     data: {
-      leccion_id: leccionComunicacion2.id,
-      tipo: "ESCRIBIR",
-      pregunta: "Escribe un resumen de tu cuento.",
-      orden: 1,
+      lesson_id: communicationLesson2.id,
+      type: "ESCRIBIR",
+      question: "Escribe un resumen de tu cuento.",
+      order_num: 1,
     },
   });
 
-  console.log("Datos de ejemplo creados correctamente");
+  console.log("Sample data created successfully.");
 }
 
 main()
