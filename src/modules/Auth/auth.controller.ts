@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { handleErrorResponse } from "../../utils/errorhandler";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, contrasena } = req.body;
+  const { email, password } = req.body;
 
   try {
     //* Buscar usuario por email
@@ -15,12 +15,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     //* Validar si existe
     if (!user) {
-      res.status(404).json({ error: "User not found" }); // ⬅️ Sin return
+      res.status(404).json({ error: "Usuario no encontrado" }); // ⬅️ Sin return
       return;
     }
 
     //* Comparar contraseña
-    const isMatch = await bcrypt.compare(contrasena, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       res.status(404).json({ error: "La contraseña es incorrecta" }); // ⬅️ Sin return
       return;

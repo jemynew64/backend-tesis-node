@@ -28,6 +28,7 @@ export const getAchievementById = async (req: Request, res: Response) => {
     const achievement = await findAchievementById(Number(id));
     if (!achievement) {
        res.status(404).json({ message: "Achievement no encontrada" });
+       return;
     }
     res.status(200).json(achievement);
   } catch (error) {
