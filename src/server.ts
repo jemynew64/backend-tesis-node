@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors"
+
 import usersRoutes from "./modules/User/User.routes"
  import authRoutes from "./modules/Auth/auth.routes"
  import cursosRoutes from "./modules/Course/Course.routes"
@@ -40,4 +41,5 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`CORS permitido desde: ${process.env.CORS_ORIGIN}`);
 });

@@ -30,15 +30,28 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const token = generateToken({
       id: user.id,
       email: user.email,
-      tipo_usuario: user.user_type,
+      user_type: user.user_type,
     });
-    const usuario =({
+    const User =({
       id: user.id,
       email: user.email,
-      tipo_usuario: user.user_type,
+      user_type: user.user_type,
     });
     //* Enviar respuesta
-    res.json({ msg: "Login successful", token ,usuario }); // ⬅️ Sin return
+        //* Mostrar en consola
+        console.log("✅ Login exitoso:");
+        console.log({
+          msg: "Login successful",
+          token,
+          user: User,
+        });
+    
+        //* Enviar respuesta
+        res.json({
+          msg: "Login successful",
+          token,
+          user: User,
+        });
   } catch (error) {
     handleErrorResponse(res, error);
   }

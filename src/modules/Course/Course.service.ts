@@ -31,3 +31,55 @@ export const updateCourseById = async (
     data: validatedData,
   });
 };
+
+export const courseidunitlesson= async (id: number,user_id:number) => {
+  return await CourseModel.findFirst(
+    { where: { id } ,
+    select:{
+      title:true,
+      unit:{
+        select:{
+          title:true,
+          description:true,
+          lesson:{
+            select:{
+              id:true,
+              title:true,
+              lesson_progress: {
+                where: {
+                  user_id: user_id,
+                },
+                select: {
+                  completed: true,
+                },
+              },
+            }
+          }
+        }
+      }
+    }
+  });
+};
+// export const courseidunitlesson= async (id: number) => {
+//   return await CourseModel.findUnique(
+//     { where: { id } ,
+//     select:{
+//       id:true,
+//       title:true,
+//       unit:{
+//         select:{
+//           title:true,
+//           description:true,
+//           lesson:{
+//             select:{
+//               id:true,
+//               title:true
+//             }
+//           }
+//         }
+//       }
+//     }
+  
+  
+//   });
+// };
