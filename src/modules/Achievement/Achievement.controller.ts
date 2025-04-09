@@ -7,7 +7,7 @@ import {
   deleteAchievementById,
   updateAchievementById,
 } from "./achievement.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Obtener todos los logros
 export const getAchievement = async (req: Request, res: Response) => {

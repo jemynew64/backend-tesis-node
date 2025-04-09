@@ -6,7 +6,7 @@ import {
   deleteOptionById,
   updateOptionById,
 } from "./ChallengeOption.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 export const getOptions = async (req: Request, res: Response) => {
   try {

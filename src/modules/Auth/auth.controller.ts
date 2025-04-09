@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../../database/prismaClient";
 import { generateToken } from "../../utils/jwt";
 import bcrypt from "bcrypt";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;

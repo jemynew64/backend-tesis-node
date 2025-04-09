@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UnitSchema, UnitType } from "./UnitSchema";
 import * as UnitService from "./Unit.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get units
 export const getUnit = async (req: Request, res: Response) => {

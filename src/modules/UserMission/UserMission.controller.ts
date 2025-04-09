@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUserMissionService, createUserMissionService, getUserMissionByIdService, updateUserMissionService, deleteUserMissionService } from "./UserMission.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get user missions with pagination
 export const getUserMissionHandler = async (req: Request, res: Response) => {

@@ -7,7 +7,7 @@ import {
   deleteChallengeById,
   updateChallengeById,
 } from "./challenge.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 export const getChallenges = async (req: Request, res: Response) => {
   try {
