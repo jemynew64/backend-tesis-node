@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors"
+
 import usersRoutes from "./modules/User/User.routes"
  import authRoutes from "./modules/Auth/auth.routes"
  import cursosRoutes from "./modules/Course/Course.routes"

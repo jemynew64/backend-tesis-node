@@ -5,6 +5,7 @@ import {
   createNewCourse,
   deleteCourseById,
   updateCourseById,
+  courseidunitlesson
 } from "./Course.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
@@ -57,6 +58,20 @@ export const updateCourse = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updatedCourse = await updateCourseById(Number(id), req.body);
     res.status(200).json(updatedCourse);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+export const getcourseidunitlesson = async (req: Request, res: Response) => {
+  try {
+    const { id, user_id} = req.params;
+    const course = await courseidunitlesson(Number(id),Number(user_id));
+    if (!course) {
+      res.status(404).json({ message: "Curso no encontrado" });
+      return;
+    }
+    res.status(200).json(course);
   } catch (error) {
     handleErrorResponse(res, error);
   }

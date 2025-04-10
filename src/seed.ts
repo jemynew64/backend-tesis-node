@@ -32,6 +32,7 @@ async function main() {
   const saltRounds = 10;
   const hashedPassword1 = await bcrypt.hash("123456", saltRounds);
   const hashedPassword2 = await bcrypt.hash("123456", saltRounds);
+  const hashedPassword3 = await bcrypt.hash("123456", saltRounds);
 
   // Create Users
   const adminUser = await prisma.user_account.create({
@@ -49,6 +50,15 @@ async function main() {
       name: "Juan Pérez",
       email: "juan@ejemplo.com",
       password: hashedPassword2,
+      profile_image: "/default_user.png",
+    },
+  });
+
+  const regularUser2 = await prisma.user_account.create({
+    data: {
+      name: "Alejandro marino",
+      email: "Alejo@gmail.com",
+      password: hashedPassword3,
       profile_image: "/default_user.png",
     },
   });
@@ -223,12 +233,144 @@ async function main() {
     },
   });
 
-  console.log("Sample data created successfully.");
+  // Create Achievements
+  const achievements = await prisma.achievement.createMany({
+    data: [
+      {
+        title: "Primer Paso",
+        description: "Completa tu primera lección",
+        image_src: "first-step.png",
+        required_experience: 10,
+        required_level: 1
+      },
+      {
+        title: "Matemático Novato",
+        description: "Completa 5 lecciones de matemáticas",
+        image_src: "math-novice.png",
+        required_experience: 50,
+        required_level: 2
+      },
+      {
+        title: "Escritor en Desarrollo",
+        description: "Completa 3 lecciones de comunicación",
+        image_src: "writer.png",
+        required_experience: 30,
+        required_level: 1
+      }
+    ]
+  });
+
+  // Create Missions
+  const missions = await prisma.mission.createMany({
+    data: [
+      {
+        title: "Completa tu primera lección",
+        description: "Completa cualquier lección para comenzar tu viaje de aprendizaje",
+        granted_experience: 10
+      },
+      {
+        title: "Estudiante dedicado",
+        description: "Completa 5 lecciones en un día",
+        granted_experience: 50
+      },
+      {
+        title: "Explorador de cursos",
+        description: "Completa lecciones en dos cursos diferentes",
+        granted_experience: 30
+      }
+    ]
+  });
+
+  // Set user progress (active courses)
+  await prisma.user_progress.createMany({
+    data: [
+      {
+        user_id: regularUser.id,
+        active_course_id: mathCourse.id
+      },
+      {
+        user_id: regularUser2.id,
+        active_course_id: communicationCourse.id
+      }
+    ]
+  });
+
+  // Create some lesson progress for regularUser
+  await prisma.lesson_progress.createMany({
+    data: [
+      {
+        user_id: regularUser.id,
+        lesson_id: mathLesson1.id,
+        completed: true
+      },
+      {
+        user_id: regularUser.id,
+        lesson_id: mathLesson2.id,
+        completed: false
+      }
+    ]
+  });
+
+  // Create some challenge progress for regularUser
+  await prisma.challenge_progress.createMany({
+    data: [
+      {
+        user_id: regularUser.id,
+        challenge_id: additionChallenge1.id,
+        completed: true
+      },
+      {
+        user_id: regularUser.id,
+        challenge_id: additionChallenge2.id,
+        completed: false
+      }
+    ]
+  });
+
+  // Assign some achievements to users
+  await prisma.earned_achievement.createMany({
+    data: [
+      {
+        user_id: regularUser.id,
+        achievement_id: 1 // Primer Paso
+      },
+      {
+        user_id: regularUser2.id,
+        achievement_id: 1 // Primer Paso
+      }
+    ]
+  });
+
+  // Assign some missions to users
+  await prisma.user_mission.createMany({
+    data: [
+      {
+        user_id: regularUser.id,
+        mission_id: 1,
+        completed: true,
+        completed_at: new Date()
+      },
+      {
+        user_id: regularUser.id,
+        mission_id: 2,
+        completed: false
+      },
+      {
+        user_id: regularUser2.id,
+        mission_id: 1,
+        completed: true,
+        completed_at: new Date()
+      }
+    ]
+  });
+
+  console.log("La data se ha creado correctamente.");
 }
 
 main()
   .catch((e) => {
-    throw e;
+    console.error("Error al ejecutar el seed:", e);
+    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
