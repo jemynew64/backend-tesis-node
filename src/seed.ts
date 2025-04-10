@@ -3,8 +3,17 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+
+
 async function main() {
   // Create Courses
+  await prisma.challenge_option.deleteMany();
+  await prisma.challenge.deleteMany();
+  await prisma.lesson.deleteMany();
+  await prisma.unit.deleteMany();
+  await prisma.user_account.deleteMany();
+  await prisma.course.deleteMany();
+  
   const mathCourse = await prisma.course.create({
     data: {
       title: "Matemáticas",

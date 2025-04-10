@@ -13,15 +13,22 @@ import usersRoutes from "./modules/User/User.routes"
  import misionRoutes from "./modules/Mission/Mission.routes"
  import misionUsuarioRoutes from "./modules/UserMission/UserMission.routes"
 const app = express();
+
+app.use(express.json()); // Para parsear application/json
+app.use(express.urlencoded({ extended: true })); // Para parsear application/x-www-form-urlencod
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+      "http://localhost:5173",    // Desarrollo local
+      "http://frontend:5173",     // Frontend en Docker
+      "http://localhost:3000"     // Backend (por si acaso)
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
 
-app.use(express.json());
 
 // Routes 9 echas
   app.use("/api/misiones",misionRoutes );
@@ -37,8 +44,10 @@ app.use(express.json());
  app.use("/api/reto",retoRoutes );
   app.use("/api/auth", authRoutes);
  
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`CORS enabled for origin: ${process.env.CORS_ORIGIN}`);
-});
+  const PORT = Number(process.env.PORT) || 3000;  // Convierte el valor a número
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`CORS enabled for origin: ${process.env.CORS_ORIGIN}`);
+  });
+  
+  

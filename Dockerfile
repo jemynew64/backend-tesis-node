@@ -1,7 +1,7 @@
 FROM node:20-alpine AS development
 
 # Instalar PostgreSQL client (esto es necesario para usar pg_isready)
-RUN apk add --no-cache postgresql-client
+RUN apk add --no-cache postgresql-client curl
 
 WORKDIR /usr/src/app
 
@@ -20,7 +20,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 # Instalar PostgreSQL client (esto es necesario para usar pg_isready)
-RUN apk add --no-cache postgresql-client
+RUN apk add --no-cache postgresql-client curl
 
 WORKDIR /usr/src/app
 
