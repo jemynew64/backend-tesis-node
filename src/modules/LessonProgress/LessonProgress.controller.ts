@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { LessonProgressSchema, LessonProgressType } from "../../schemas/index";
 import * as LessonProgressService from "./LessonProgress.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Obtener progreso de lecciones
 export const getLessonProgress = async (req: Request, res: Response) => {

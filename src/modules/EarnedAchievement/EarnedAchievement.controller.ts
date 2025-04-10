@@ -6,7 +6,7 @@ import {
   removeEarnedAchievementById,
   modifyEarnedAchievementById,
 } from "./EarnedAchievement.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Obtener todos los logros ganados
 export const getEarnedAchievements = async (req: Request, res: Response) => {

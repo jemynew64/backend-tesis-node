@@ -7,7 +7,7 @@ import {
   updateCourseById,
   courseidunitlesson
 } from "./Course.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 export const getCourses = async (req: Request, res: Response) => {
   try {

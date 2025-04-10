@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService } from "./User.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get all users with pagination
 export const getUsersHandler = async (req: Request, res: Response) => {

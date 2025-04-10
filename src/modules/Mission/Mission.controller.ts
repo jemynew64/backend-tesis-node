@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { MissionSchema, MissionType } from "../../schemas/index";
 import * as MissionService from "./Mission.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get missions
 export const getMission = async (req: Request, res: Response) => {

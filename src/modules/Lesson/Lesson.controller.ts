@@ -6,7 +6,7 @@ import {
   removeLessonById,
   modifyLessonById,
 } from "./Lesson.service";
-import { handleErrorResponse } from "../../utils/errorhandler";
+import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get all lessons
 export const getLessons = async (req: Request, res: Response) => {
