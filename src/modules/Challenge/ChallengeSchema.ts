@@ -6,6 +6,7 @@ export const ChallengeSchema = z.object({
   question: z.string(),
   order_num: z.number().min(1, "El orden debe ser un número positivo"),
   lesson_id: z.number().min(1, "Debe referenciar una lección válida"),
+  image_src: z.string().optional(),
 });
 
 export type ChallengeType = z.infer<typeof ChallengeSchema>;

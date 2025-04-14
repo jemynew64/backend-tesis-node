@@ -39,6 +39,20 @@ export const updateOptionById = async (
   data: Partial<ChallengeOptionType>
 ) => {
   const validatedData = ChallengeOptionSchema.partial().parse(data);
+
+    // Obtener la opción actual para comparar
+    const currentOption = await ChallengeOptionModel.findUnique({
+      where: { id },
+      select: { image_src: true }
+    });
+
+  // Subimos la imagen solo si es distinta a la actual
+  if (
+    validatedData.image_src && validatedData.image_src !== currentOption?.image_src
+  ) {
+    validatedData.image_src = await uploadImageToCloudinary(validatedData.image_src);
+  }
+
   return await ChallengeOptionModel.update({
     where: { id },
     data: validatedData,
