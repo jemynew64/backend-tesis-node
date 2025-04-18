@@ -10,7 +10,7 @@ export const UserSchema = z.object({
   points: z.number().min(0).default(0),
   experience: z.number().min(0).default(0),
   level: z.number().min(1).default(1),
-  user_type: z.enum(["estudiante", "profesor"]).default("estudiante"),
+  user_type: z.enum(["student", "admin"]).default("student"),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

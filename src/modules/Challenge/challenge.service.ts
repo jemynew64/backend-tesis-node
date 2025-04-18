@@ -3,6 +3,17 @@ import { ChallengeModel } from "../../database/prismaClient";
 import { ChallengeSchema, ChallengeType } from "./ChallengeSchema";
 import { uploadImageToCloudinary } from "../../utils/uploadImage";
 
+// 3. Nuevo servicio en challenge.service.ts
+export const findChallengesByLessonId = async (lesson_id: number) => {
+  return await ChallengeModel.findMany({
+    where: { lesson_id },
+    orderBy: { order_num: "asc" }, // opcional: ordenar por orden_num
+  });
+};
+//si es que quiero incluir lo que viene 
+// include: {
+//   challenge_option: true // opcional: si quieres traer las opciones
+// }
 export const findAllChallenges = async (page = 1, limit = 10) => {
   return await ChallengeModel.findMany({
     take: limit,

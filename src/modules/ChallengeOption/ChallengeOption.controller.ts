@@ -5,6 +5,7 @@ import {
   createNewOption,
   deleteOptionById,
   updateOptionById,
+  findChallengesoptionBychallengeId,
 } from "./ChallengeOption.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
@@ -60,6 +61,23 @@ export const updateOption = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updatedOption = await updateOptionById(Number(id), req.body);
     res.status(200).json(updatedOption);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+// 2. Nuevo controlador en Challenge.controller.ts
+export const getChallengesByLessonId = async (req: Request, res: Response) => {
+  try {
+    const { challenge_id } = req.params;
+    const challenges = await findChallengesoptionBychallengeId(Number(challenge_id));
+
+    if (!challenges || challenges.length === 0) {
+      res.status(404).json({ message: "No se encontraron desafíos para esta lección." });
+      return;
+    }
+
+    res.status(200).json(challenges);
   } catch (error) {
     handleErrorResponse(res, error);
   }

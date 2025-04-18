@@ -2,6 +2,14 @@ import { ChallengeOptionModel } from "../../database/prismaClient";
 import { ChallengeOptionSchema, ChallengeOptionType } from "./ChallengeOptionSchema";
 import { uploadImageToCloudinary } from "../../utils/uploadImage";
 
+
+// 3. Nuevo servicio en challenge.service.ts
+export const findChallengesoptionBychallengeId = async (challenge_id: number) => {
+  return await ChallengeOptionModel.findMany({
+    where: { challenge_id },
+    });
+};
+
 export const findAllOptions = async (page = 1, limit = 10) => {
   return await ChallengeOptionModel.findMany({
     take: limit,
