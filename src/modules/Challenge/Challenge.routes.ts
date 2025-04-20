@@ -6,6 +6,7 @@ import {
   getChallengeById,
   updateChallenge,
   getChallengesByLessonId,
+  getQuizzBychallengeId,
   uploadImage
 } from "./Challenge.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
@@ -19,6 +20,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get("/", authenticate, getChallenges);
 router.post("/", authenticate, createChallenge);
 router.get("/lesson/:lesson_id", authenticate, getChallengesByLessonId);
+router.get("/quizz/:lesson_id", authenticate, getQuizzBychallengeId);
 router.get("/:id", authenticate, getChallengeById);
 router.put("/:id", authenticate, updateChallenge);
 router.delete("/:id", authenticate, deleteChallenge);
