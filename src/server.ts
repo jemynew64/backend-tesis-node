@@ -13,6 +13,7 @@ import usersRoutes from "./modules/User/User.routes"
  import progresoLeccion from "./modules/LessonProgress/lessonProgress.routes"
  import misionRoutes from "./modules/Mission/Mission.routes"
  import misionUsuarioRoutes from "./modules/UserMission/UserMission.routes"
+ import excelRoutes from "./modules/ImportExcel/importExcel.routes"
 const app = express();
 
 app.use(express.json()); // Para parsear application/json
@@ -40,10 +41,11 @@ app.use(
   app.use("/api/lecciones",leccionRoutes );
   app.use("/api/progresoLeccion",progresoLeccion );
   app.use("/api/logros",logroRoutes );
- app.use("/api/logroObtenido",logroObtenidoRoutes );
- app.use("/api/opcionReto",opcionRetoRoutes );
- app.use("/api/reto",retoRoutes );
+  app.use("/api/logroObtenido",logroObtenidoRoutes );
+  app.use("/api/opcionReto",opcionRetoRoutes );
+  app.use("/api/reto",retoRoutes );
   app.use("/api/auth", authRoutes);
+  app.use("/api/excel", excelRoutes);
  
   const PORT = Number(process.env.PORT) || 3000;  // Convierte el valor a número
   app.listen(PORT, '0.0.0.0', () => {

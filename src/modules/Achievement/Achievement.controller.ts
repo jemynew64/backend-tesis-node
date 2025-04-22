@@ -13,7 +13,7 @@ import { handleErrorResponse } from "../../utils/errorHandler";
 export const getAchievement = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 1000;
     const achievements = await findAllAchievements(page, limit);
     res.status(200).json(achievements);
   } catch (error) {

@@ -14,7 +14,7 @@ import { uploadImageToCloudinary } from "../../utils/uploadImage";
 export const getChallenges = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 1000;
     const challenges = await findAllChallenges(page, limit);
     res.status(200).json(challenges);
   } catch (error) {
@@ -70,16 +70,12 @@ export const getChallengesByLessonId = async (req: Request, res: Response) => {
   try {
     const { lesson_id } = req.params;
     const challenges = await findChallengesByLessonId(Number(lesson_id));
-    if (!challenges || challenges.length === 0) {
-       res.status(404).json({ message: "No se encontraron desafíos para esta lección." });
-      return;
-
-    }
-    res.status(200).json(challenges);
+    res.status(200).json(challenges); // siempre devuelve array, aunque sea vacío
   } catch (error) {
     handleErrorResponse(res, error);
   }
 };
+
 //para los quizz
 export const getQuizzBychallengeId = async (req: Request, res: Response) => {
   try {

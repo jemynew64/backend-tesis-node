@@ -147,8 +147,9 @@ async function main() {
   const additionChallenge1 = await prisma.challenge.create({
     data: {
       lesson_id: mathLesson1.id,
-      type: "SELECCIONAR",
+      type: "seleccionar",
       question: "¿Cuánto es 7 + 5?",
+      image_src:"https://example.com/image.png",
       order_num: 1,
     },
   });
@@ -164,9 +165,10 @@ async function main() {
   const additionChallenge2 = await prisma.challenge.create({
     data: {
       lesson_id: mathLesson1.id,
-      type: "SELECCIONAR",
+      type: "seleccionar",
       question: "¿Cuánto es 15 + 8?",
       order_num: 2,
+      image_src:"https://example.com/image.png",
     },
   });
 

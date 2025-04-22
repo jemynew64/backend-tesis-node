@@ -12,7 +12,7 @@ import { handleErrorResponse } from "../../utils/errorHandler";
 export const getOptions = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const limit = Number(req.query.limit) || 1000;
     const options = await findAllOptions(page, limit);
     res.status(200).json(options);
     return;
@@ -71,12 +71,6 @@ export const getChallengesByLessonId = async (req: Request, res: Response) => {
   try {
     const { challenge_id } = req.params;
     const challenges = await findChallengesoptionBychallengeId(Number(challenge_id));
-
-    if (!challenges || challenges.length === 0) {
-      res.status(404).json({ message: "No se encontraron desafíos para esta lección." });
-      return;
-    }
-
     res.status(200).json(challenges);
   } catch (error) {
     handleErrorResponse(res, error);
