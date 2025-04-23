@@ -5,7 +5,8 @@ import {
   createNewCourse,
   deleteCourseById,
   updateCourseById,
-  courseidunitlesson
+  courseidunitlesson,
+  courseWithUnlockedLessons
 } from "./Course.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
@@ -72,6 +73,25 @@ export const getcourseidunitlesson = async (req: Request, res: Response) => {
       return;
     }
     res.status(200).json(course);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+//para el bloqueo
+export const getCourseWithUnlockedLessons = async (req: Request, res: Response) => {
+  try {
+    const courseId = Number(req.params.courseId);
+    const userId = Number(req.params.userId);
+
+    const data = await courseWithUnlockedLessons(courseId, userId);
+    if (!data) {
+     res.status(404).json({ message: "Curso no encontrado" });
+      return;
+    }
+      
+
+    res.status(200).json(data);
   } catch (error) {
     handleErrorResponse(res, error);
   }

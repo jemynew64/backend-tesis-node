@@ -1,4 +1,4 @@
-import { LessonModel } from "../../database/prismaClient";
+import { LessonModel ,LessonProgressModel } from "../../database/prismaClient";
 import { LessonSchema, LessonType } from "./LessonSchema";
 
 // Fetch lessons with pagination
@@ -55,5 +55,38 @@ export const modifyLessonById = async (id: number, data: Partial<LessonType>) =>
   return await LessonModel.update({
     where: { id },
     data: validatedData,
+  });
+};
+
+// Crear progreso si no existe
+export const iniciarProgresoLeccion = async (lessonId: number, userId: number) => {
+  const existe = await LessonProgressModel.findFirst({
+    where: {
+      lesson_id: lessonId,
+      user_id: userId,
+    },
+  });
+
+  if (!existe) {
+    await LessonProgressModel.create({
+      data: {
+        lesson_id: lessonId,
+        user_id: userId,
+        completed: false,
+      },
+    });
+  }
+};
+
+// Marcar lección como completada
+export const completarProgresoLeccion = async (lessonId: number, userId: number) => {
+  await LessonProgressModel.updateMany({
+    where: {
+      lesson_id: lessonId,
+      user_id: userId,
+    },
+    data: {
+      completed: true,
+    },
   });
 };

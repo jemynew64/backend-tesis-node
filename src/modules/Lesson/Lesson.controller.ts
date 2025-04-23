@@ -5,6 +5,8 @@ import {
   createNewLesson,
   removeLessonById,
   modifyLessonById,
+  completarProgresoLeccion,
+  iniciarProgresoLeccion
 } from "./Lesson.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
@@ -63,6 +65,30 @@ export const deleteLesson = async (req: Request, res: Response) => {
     const { id } = req.params;
     await removeLessonById(Number(id));
     res.status(200).json({ message: "Leccion eleminada satisfactoriamente" });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+// POST /iniciar/:lessonId/:userId
+export const iniciarLeccion = async (req: Request, res: Response) => {
+  try {
+    const lessonId = Number(req.params.lessonId);
+    const userId = Number(req.params.userId);
+    await iniciarProgresoLeccion(lessonId, userId);
+    res.status(200).json({ message: "Progreso inicializado correctamente." });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+// POST /completar/:lessonId/:userId
+export const completarLeccion = async (req: Request, res: Response) => {
+  try {
+    const lessonId = Number(req.params.lessonId);
+    const userId = Number(req.params.userId);
+    await completarProgresoLeccion(lessonId, userId);
+    res.status(200).json({ message: "Lección completada correctamente." });
   } catch (error) {
     handleErrorResponse(res, error);
   }
