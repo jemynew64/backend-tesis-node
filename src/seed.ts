@@ -35,7 +35,8 @@ async function main() {
   const hashedPassword3 = await bcrypt.hash("123456", saltRounds);
 
   // Create Users
-  const adminUser = await prisma.user_account.create({
+  //const adminUser =
+   await prisma.user_account.create({
     data: {
       name: "jemal",
       email: "jemal@ejemplo.com",
@@ -217,7 +218,8 @@ async function main() {
   });
 
   // Communication Challenges
-  const communicationChallenge1 = await prisma.challenge.create({
+  //const communicationChallenge1 =
+   await prisma.challenge.create({
     data: {
       lesson_id: communicationLesson1.id,
       type: "ESCRIBIR",
@@ -225,8 +227,8 @@ async function main() {
       order_num: 1,
     },
   });
-
-  const communicationChallenge2 = await prisma.challenge.create({
+  //const communicationChallenge2 =
+   await prisma.challenge.create({
     data: {
       lesson_id: communicationLesson2.id,
       type: "ESCRIBIR",
@@ -236,7 +238,8 @@ async function main() {
   });
 
   // Create Achievements
-  const achievements = await prisma.achievement.createMany({
+  //const achievements =
+   await prisma.achievement.createMany({
     data: [
       {
         title: "Primer Paso",
@@ -263,7 +266,8 @@ async function main() {
   });
 
   // Create Missions
-  const missions = await prisma.mission.createMany({
+  //const missions =
+   await prisma.mission.createMany({
     data: [
       {
         title: "Completa tu primera lección",

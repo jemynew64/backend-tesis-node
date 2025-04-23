@@ -49,11 +49,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     };
     
     const token = generateToken(tokenPayload);
-    const usuario = {
-      id: user.id,
-      email: user.email,
-      tipo_usuario: user.user_type,
-    };
+    // const usuario = {
+    //   id: user.id,
+    //   email: user.email,
+    //   tipo_usuario: user.user_type,
+    // };
 
     // 5. Respuesta exitosa
     console.log('✅ Login exitoso para:', email);
