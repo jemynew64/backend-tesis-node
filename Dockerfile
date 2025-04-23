@@ -1,34 +1,37 @@
-FROM node:20-alpine AS development
+# ------------------------------
+# Etapa 1: Desarrollo y Build
+# ------------------------------
+    FROM node:20-alpine AS build
 
-# Instalar PostgreSQL client (esto es necesario para usar pg_isready)
-RUN apk add --no-cache postgresql-client curl
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install
-
-# Copia todos los archivos, incluyendo el schema.prisma
-COPY . .
-
-RUN npm run build
-
-FROM node:20-alpine  AS production
-
-ARG NODE_ENV=production 
-ENV NODE_ENV=${NODE_ENV}
-
-# Instalar PostgreSQL client (esto es necesario para usar pg_isready)
-RUN apk add --no-cache postgresql-client curl
-
-WORKDIR /usr/src/app
-
-COPY package*.json .
-
-RUN npm ci --only=production
-# Copiar la carpeta dist y prisma desde el contenedor de desarrollo
-COPY --from=development /usr/src/app/dist ./dist
-COPY --from=development /usr/src/app/prisma ./prisma
-
-CMD [ "node", "dist/server.js" ]
+    RUN apk add --no-cache postgresql-client curl
+    
+    WORKDIR /usr/src/app
+    
+    COPY package*.json ./
+    RUN npm install
+    
+    COPY . .
+    RUN npm run build
+    RUN npx prisma generate
+    
+    # ------------------------------
+    # Etapa 2: Producción
+    # ------------------------------
+    FROM node:20-alpine AS production
+    
+    ENV NODE_ENV=production
+    
+    RUN apk add --no-cache postgresql-client curl
+    
+    WORKDIR /usr/src/app
+    
+    COPY package*.json ./
+    RUN npm ci --only=production
+    
+    COPY --from=build /usr/src/app/dist ./dist
+    COPY --from=build /usr/src/app/prisma ./prisma
+    
+    EXPOSE 3000
+    
+    CMD ["node", "dist/server.js"]
+    
