@@ -10,7 +10,7 @@
     COPY package*.json ./
     RUN npm install
     
-    COPY . .
+    COPY . . 
     RUN npm run build
     RUN npx prisma generate
     
@@ -30,6 +30,9 @@
     
     COPY --from=build /usr/src/app/dist ./dist
     COPY --from=build /usr/src/app/prisma ./prisma
+    
+    # 🔧 AÑADE ESTO 👇
+    RUN npx prisma generate
     
     EXPOSE 3000
     
