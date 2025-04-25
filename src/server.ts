@@ -14,6 +14,7 @@ import progresoLeccion from "./modules/LessonProgress/lessonProgress.routes";
 import misionRoutes from "./modules/Mission/Mission.routes";
 import misionUsuarioRoutes from "./modules/UserMission/UserMission.routes";
 import excelRoutes from "./modules/ImportExcel/importExcel.routes";
+import quizzRoutes from "./modules/quizz/Quiz.routes"
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/api/opcionReto", opcionRetoRoutes);
 app.use("/api/reto", retoRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/excel", excelRoutes);
+app.use("/api/quizzpoints", quizzRoutes);
 
 // ✅ Servidor
 const PORT = Number(process.env.PORT) || 3000;
