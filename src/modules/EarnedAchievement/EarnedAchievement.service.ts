@@ -19,6 +19,15 @@ export const fetchEarnedAchievementById = async (id: number) => {
 // Crear un nuevo logro ganado
 export const createNewEarnedAchievement = async (data: EarnedAchievementType) => {
   const validatedData = EarnedAchievementSchema.parse(data);
+  const exists = await EarnedAchievementModel.findFirst({
+    where: {
+      achievement_id: validatedData.achievement_id,
+      user_id: validatedData.user_id,
+    },
+  });
+  if (exists) {
+    throw new Error("Este usuario ya ha obtenido este logro.");
+  }
   return await EarnedAchievementModel.create({
     data: validatedData,
   });
