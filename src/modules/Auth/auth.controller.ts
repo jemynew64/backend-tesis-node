@@ -8,18 +8,18 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   console.log('🔵 [Login] Petición recibida'); // Log de entrada
   
   try {
-    // 1. Verificar body recibido
-    console.log('📦 Body recibido:', req.body);
+  // Paso 1: Llega la solicitud con email y password
+  console.log('📦 Body recibido:', req.body);
     const { email, password } = req.body;
-
+  // Paso 2: Validar que vengan ambos campos
     if (!email || !password) {
       console.warn('⚠️ Faltan credenciales');
       res.status(400).json({ error: "Email y contraseña son requeridos" });
       return;
     }
 
-    // 2. Buscar usuario
-    console.log(`🔍 Buscando usuario: ${email}`);
+  // Paso 3: Buscar usuario en la base de datos por email
+  console.log(`🔍 Buscando usuario: ${email}`);
     const user = await prisma.user_account.findUnique({
       where: { email },
     });
@@ -30,8 +30,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 3. Comparar contraseña
-    console.log('🔐 Comparando contraseña...');
+  // Paso 4: Comparar contraseña hasheada con la que viene del usuario
+  console.log('🔐 Comparando contraseña...');
     const isMatch = await bcrypt.compare(password, user.password);
     
     if (!isMatch) {
@@ -40,22 +40,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 4. Generar token
-    console.log('🛠️ Generando token...');
+  // Paso 5: Crear un token JWT con los datos del usuario (incluye tipo_usuario)
+  console.log('🛠️ Generando token...');
     const tokenPayload = {
       id: user.id,
       email: user.email,
-      tipo_usuario: user.user_type,
+      user_type: user.user_type,
     };
-    
     const token = generateToken(tokenPayload);
-    // const usuario = {
-    //   id: user.id,
-    //   email: user.email,
-    //   tipo_usuario: user.user_type,
-    // };
-
-    // 5. Respuesta exitosa
+  // Paso 6: Devolver token + datos del usuario al frontend
     console.log('✅ Login exitoso para:', email);
     res.json({ 
       msg: "Login successful", 
