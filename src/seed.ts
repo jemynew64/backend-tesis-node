@@ -3,17 +3,26 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-
-
 async function main() {
-  // Create Courses
+  const today = new Date('2025-05-07'); // Usa la fecha actual en producción con: new Date()
+
+  // Eliminar datos previos (orden importante por relaciones)
   await prisma.challenge_option.deleteMany();
   await prisma.challenge.deleteMany();
   await prisma.lesson.deleteMany();
   await prisma.unit.deleteMany();
+  await prisma.user_progress.deleteMany();
+  await prisma.lesson_progress.deleteMany();
+  await prisma.challenge_progress.deleteMany();
+  await prisma.earned_achievement.deleteMany();
+  await prisma.user_mission.deleteMany();
+  await prisma.daily_mission.deleteMany();
   await prisma.user_account.deleteMany();
+  await prisma.mission.deleteMany();
+  await prisma.achievement.deleteMany();
   await prisma.course.deleteMany();
-  
+
+  // Crear Cursos
   const mathCourse = await prisma.course.create({
     data: {
       title: "Matemáticas",
@@ -28,15 +37,13 @@ async function main() {
     },
   });
 
-  // Hash passwords
+  // Crear usuarios con contraseñas encriptadas
   const saltRounds = 10;
   const hashedPassword1 = await bcrypt.hash("123456", saltRounds);
   const hashedPassword2 = await bcrypt.hash("123456", saltRounds);
   const hashedPassword3 = await bcrypt.hash("123456", saltRounds);
 
-  // Create Users
-  //const adminUser =
-   await prisma.user_account.create({
+  await prisma.user_account.create({
     data: {
       name: "jemal",
       email: "jemal@ejemplo.com",
@@ -64,7 +71,7 @@ async function main() {
     },
   });
 
-  // Create Math Units
+  // Crear Unidades
   const mathUnit1 = await prisma.unit.create({
     data: {
       title: "Suma y Resta",
@@ -83,7 +90,6 @@ async function main() {
     },
   });
 
-  // Create Communication Units
   const communicationUnit1 = await prisma.unit.create({
     data: {
       title: "Lectura de Cuentos",
@@ -102,7 +108,7 @@ async function main() {
     },
   });
 
-  // Create Math Lessons
+  // Crear Lecciones
   const mathLesson1 = await prisma.lesson.create({
     data: {
       title: "Suma de Números",
@@ -127,7 +133,6 @@ async function main() {
     },
   });
 
-  // Create Communication Lessons
   const communicationLesson1 = await prisma.lesson.create({
     data: {
       title: "Responde preguntas sobre el cuento: La tortuga y la liebre",
@@ -144,13 +149,13 @@ async function main() {
     },
   });
 
-  // Math Challenges: Addition
+  // Retos de Matemáticas
   const additionChallenge1 = await prisma.challenge.create({
     data: {
       lesson_id: mathLesson1.id,
       type: "seleccionar",
       question: "¿Cuánto es 7 + 5?",
-      image_src:"https://example.com/image.png",
+      image_src: "https://example.com/image.png",
       order_num: 1,
     },
   });
@@ -169,7 +174,7 @@ async function main() {
       type: "seleccionar",
       question: "¿Cuánto es 15 + 8?",
       order_num: 2,
-      image_src:"https://example.com/image.png",
+      image_src: "https://example.com/image.png",
     },
   });
 
@@ -181,11 +186,10 @@ async function main() {
     ],
   });
 
-  // Subtraction Challenge
   const subtractionChallenge = await prisma.challenge.create({
     data: {
       lesson_id: mathLesson2.id,
-      type: "SELECCIONAR",
+      type: "seleccionar",
       question: "¿Cuánto es 9 - 4?",
       order_num: 1,
     },
@@ -199,11 +203,10 @@ async function main() {
     ],
   });
 
-  // Multiplication Challenge
   const multiplicationChallenge = await prisma.challenge.create({
     data: {
       lesson_id: mathLesson3.id,
-      type: "SELECCIONAR",
+      type: "seleccionar",
       question: "¿Cuánto es 6 x 4?",
       order_num: 1,
     },
@@ -217,165 +220,153 @@ async function main() {
     ],
   });
 
-  // Communication Challenges
-  //const communicationChallenge1 =
-   await prisma.challenge.create({
+  await prisma.challenge.create({
     data: {
       lesson_id: communicationLesson1.id,
-      type: "ESCRIBIR",
+      type: "escribir",
       question: "¿Qué sucedió al final del cuento 'La tortuga y la liebre'?",
       order_num: 1,
     },
   });
-  //const communicationChallenge2 =
-   await prisma.challenge.create({
+
+  await prisma.challenge.create({
     data: {
       lesson_id: communicationLesson2.id,
-      type: "ESCRIBIR",
+      type: "escribir",
       question: "Escribe un resumen de tu cuento.",
       order_num: 1,
     },
   });
 
-  // Create Achievements
-  //const achievements =
-   await prisma.achievement.createMany({
+  // Logros
+  const achievement1 = await prisma.achievement.create({
+    data: {
+      title: "Primer Paso",
+      description: "Completa tu primera lección",
+      image_src: "first-step.png",
+      required_experience: 10,
+      required_level: 1
+    }
+  });
+  
+   await prisma.achievement.create({
+    data: {
+      title: "Matemático Novato",
+      description: "Completa 5 lecciones de matemáticas",
+      image_src: "math-novice.png",
+      required_experience: 50,
+      required_level: 2
+    }
+  });
+  
+   await prisma.achievement.create({
+    data: {
+      title: "Escritor en Desarrollo",
+      description: "Completa 3 lecciones de comunicación",
+      image_src: "writer.png",
+      required_experience: 30,
+      required_level: 1
+    }
+  });
+  
+
+  // Misiones
+  const mission1 = await prisma.mission.create({
+    data: {
+      title: "Completa tu primera lección",
+      description: "Completa cualquier lección para comenzar tu viaje de aprendizaje",
+      granted_experience: 10
+    }
+  });
+  
+  const mission2 = await prisma.mission.create({
+    data: {
+      title: "Estudiante dedicado",
+      description: "Completa 5 lecciones en un día",
+      granted_experience: 50
+    }
+  });
+  
+  const mission3 = await prisma.mission.create({
+    data: {
+      title: "Explorador de cursos",
+      description: "Completa lecciones en dos cursos diferentes",
+      granted_experience: 30
+    }
+  });
+  
+
+  // Misiones del día
+  await prisma.daily_mission.createMany({
     data: [
-      {
-        title: "Primer Paso",
-        description: "Completa tu primera lección",
-        image_src: "first-step.png",
-        required_experience: 10,
-        required_level: 1
-      },
-      {
-        title: "Matemático Novato",
-        description: "Completa 5 lecciones de matemáticas",
-        image_src: "math-novice.png",
-        required_experience: 50,
-        required_level: 2
-      },
-      {
-        title: "Escritor en Desarrollo",
-        description: "Completa 3 lecciones de comunicación",
-        image_src: "writer.png",
-        required_experience: 30,
-        required_level: 1
-      }
+      { mission_id: mission1.id, date: today },
+      { mission_id: mission2.id, date: today },
+      { mission_id: mission3.id, date: today },
     ]
   });
+  
 
-  // Create Missions
-  //const missions =
-   await prisma.mission.createMany({
-    data: [
-      {
-        title: "Completa tu primera lección",
-        description: "Completa cualquier lección para comenzar tu viaje de aprendizaje",
-        granted_experience: 10
-      },
-      {
-        title: "Estudiante dedicado",
-        description: "Completa 5 lecciones en un día",
-        granted_experience: 50
-      },
-      {
-        title: "Explorador de cursos",
-        description: "Completa lecciones en dos cursos diferentes",
-        granted_experience: 30
-      }
-    ]
+  const todayMissions = await prisma.daily_mission.findMany({
+    where: { date: today },
   });
 
-  // Set user progress (active courses)
-  await prisma.user_progress.createMany({
-    data: [
-      {
-        user_id: regularUser.id,
-        active_course_id: mathCourse.id
-      },
-      {
-        user_id: regularUser2.id,
-        active_course_id: communicationCourse.id
-      }
-    ]
-  });
-
-  // Create some lesson progress for regularUser
-  await prisma.lesson_progress.createMany({
-    data: [
-      {
-        user_id: regularUser.id,
-        lesson_id: mathLesson1.id,
-        completed: true
-      },
-      {
-        user_id: regularUser.id,
-        lesson_id: mathLesson2.id,
-        completed: false
-      }
-    ]
-  });
-
-  // Create some challenge progress for regularUser
-  await prisma.challenge_progress.createMany({
-    data: [
-      {
-        user_id: regularUser.id,
-        challenge_id: additionChallenge1.id,
-        completed: true
-      },
-      {
-        user_id: regularUser.id,
-        challenge_id: additionChallenge2.id,
-        completed: false
-      }
-    ]
-  });
-
-  // Assign some achievements to users
-  await prisma.earned_achievement.createMany({
-    data: [
-      {
-        user_id: regularUser.id,
-        achievement_id: 1 // Primer Paso
-      },
-      {
-        user_id: regularUser2.id,
-        achievement_id: 1 // Primer Paso
-      }
-    ]
-  });
-
-  // Assign some missions to users
   await prisma.user_mission.createMany({
     data: [
       {
         user_id: regularUser.id,
-        mission_id: 1,
+        daily_mission_id: todayMissions[0].id,
         completed: true,
-        completed_at: new Date()
+        completed_at: new Date(),
       },
       {
         user_id: regularUser.id,
-        mission_id: 2,
-        completed: false
+        daily_mission_id: todayMissions[1].id,
+        completed: false,
       },
       {
         user_id: regularUser2.id,
-        mission_id: 1,
+        daily_mission_id: todayMissions[0].id,
         completed: true,
-        completed_at: new Date()
-      }
-    ]
+        completed_at: new Date(),
+      },
+    ],
   });
 
-  console.log("La data se ha creado correctamente.");
+  await prisma.user_progress.createMany({
+    data: [
+      { user_id: regularUser.id, active_course_id: mathCourse.id },
+      { user_id: regularUser2.id, active_course_id: communicationCourse.id },
+    ],
+  });
+
+  await prisma.lesson_progress.createMany({
+    data: [
+      { user_id: regularUser.id, lesson_id: mathLesson1.id, completed: true },
+      { user_id: regularUser.id, lesson_id: mathLesson2.id, completed: false },
+    ],
+  });
+
+  await prisma.challenge_progress.createMany({
+    data: [
+      { user_id: regularUser.id, challenge_id: additionChallenge1.id, completed: true },
+      { user_id: regularUser.id, challenge_id: additionChallenge2.id, completed: false },
+    ],
+  });
+
+  await prisma.earned_achievement.createMany({
+    data: [
+      { user_id: regularUser.id, achievement_id: achievement1.id },
+      { user_id: regularUser2.id, achievement_id: achievement1.id }
+    ]
+  });
+  
+
+  console.log("✅ La data se ha creado correctamente.");
 }
 
 main()
   .catch((e) => {
-    console.error("Error al ejecutar el seed:", e);
+    console.error("❌ Error al ejecutar el seed:", e);
     process.exit(1);
   })
   .finally(async () => {

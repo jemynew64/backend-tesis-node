@@ -1,5 +1,6 @@
 import { UserMissionModel } from "../../database/prismaClient";
 import { UserMissionSchema, UserMissionType } from "../../schemas/index";
+import { startOfToday } from "date-fns";
 
 // Get user missions with pagination
 export const getUserMissionService = async (page: number, limit: number) => {
@@ -46,4 +47,25 @@ export const deleteUserMissionService = async (id: number) => {
     await UserMissionModel.delete({
         where: { id },
     });
+};
+
+//para listar los dias xd 
+
+// Misiones del día para un usuario
+export const getUserMissionsTodayService = async (userId: number) => {
+  const today = startOfToday();
+
+  return await UserMissionModel.findMany({
+    where: {
+      user_id: userId,
+      daily_mission: {
+        date: today,
+      },
+    },
+    include: {
+      daily_mission: {
+        include: { mission: true },
+      },
+    },
+  });
 };

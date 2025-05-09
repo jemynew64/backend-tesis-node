@@ -20,3 +20,4 @@ export const UserMissionModel = prisma.user_mission;      // mision_usuario
 export const LessonProgressModel = prisma.lesson_progress;        // progreso_leccion
 export const ChallengeProgressModel = prisma.challenge_progress;  // progreso_reto
 export const UserProgressModel = prisma.user_progress;            // progreso_usuario
+export const DailyMissionModel = prisma.daily_mission;            // progreso_usuario

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserMissionService, createUserMissionService, getUserMissionByIdService, updateUserMissionService, deleteUserMissionService } from "./UserMission.service";
+import { getUserMissionService, createUserMissionService, getUserMissionByIdService, updateUserMissionService, deleteUserMissionService,getUserMissionsTodayService} from "./UserMission.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get user missions with pagination
@@ -68,3 +68,27 @@ export const deleteUserMissionHandler = async (req: Request, res: Response) => {
         handleErrorResponse(res, error);
     }
 };
+
+// Misiones del día para un usuario
+export const getUserMissionsTodayHandler = async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+         res.status(401).json({ message: "No autorizado" });
+         return;
+      }
+  
+      const missions = await getUserMissionsTodayService(userId);
+  
+      res.status(200).json(
+        missions.map((m) => ({
+          id: m.id,
+          completed: m.completed,
+          mission: m.daily_mission.mission,
+        }))
+      );
+    } catch (error) {
+      handleErrorResponse(res, error);
+    }
+  };
+  

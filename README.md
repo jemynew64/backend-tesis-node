@@ -23,108 +23,146 @@ docker exec -it my_postgres psql -U jemal -d mydb
 ```sql
 BEGIN;
 
--- Tabla Curso
-CREATE TABLE curso (
+-- Crear tabla Course (Curso)
+CREATE TABLE course (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    imagen_src VARCHAR(255) NOT NULL
+    title VARCHAR(255) NOT NULL,
+    image_src VARCHAR(255) NOT NULL
 );
 
--- Tabla Unidad
-CREATE TABLE unidad (
+-- Crear tabla Unit (Unidad)
+CREATE TABLE unit (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descripcion TEXT NOT NULL,
-    orden INTEGER NOT NULL,
-    curso_id INTEGER NOT NULL REFERENCES curso(id) ON DELETE CASCADE
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    order_num INTEGER NOT NULL,
+    course_id INTEGER NOT NULL REFERENCES course(id) ON DELETE CASCADE
 );
 
--- Tabla Lección
-CREATE TABLE leccion (
+-- Crear tabla Lesson (Lección)
+CREATE TABLE lesson (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    orden INTEGER NOT NULL,
-    unidad_id INTEGER NOT NULL REFERENCES unidad(id) ON DELETE CASCADE
+    title VARCHAR(255) NOT NULL,
+    order_num INTEGER NOT NULL,
+    unit_id INTEGER NOT NULL REFERENCES unit(id) ON DELETE CASCADE
 );
 
--- Tabla Usuario
-CREATE TABLE usuario (
+-- Crear tabla User (Usuario)
+CREATE TABLE user_account (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     email VARCHAR(254) NOT NULL UNIQUE,
-    contrasena VARCHAR(255) NOT NULL,
-    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    imagen_perfil VARCHAR(255) NOT NULL DEFAULT '/default_user.png',
-    corazones INTEGER NOT NULL DEFAULT 5,
-    puntos INTEGER NOT NULL DEFAULT 0,
-    experiencia INTEGER NOT NULL DEFAULT 0,
-    nivel INTEGER NOT NULL DEFAULT 1,
-    tipo_usuario VARCHAR(10) NOT NULL DEFAULT 'estudiante'
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    profile_image VARCHAR(255) NOT NULL DEFAULT '/default_user.png',
+    hearts INTEGER NOT NULL DEFAULT 5,
+    points INTEGER NOT NULL DEFAULT 0,
+    experience INTEGER NOT NULL DEFAULT 0,
+    level INTEGER NOT NULL DEFAULT 1,
+    user_type VARCHAR(10) NOT NULL DEFAULT 'student'
 );
 
--- Tabla Reto
-CREATE TABLE reto (
+-- Crear tabla Challenge (Reto)
+CREATE TABLE challenge (
     id SERIAL PRIMARY KEY,
-    tipo VARCHAR(20) NOT NULL,
-    pregunta TEXT NOT NULL,
-    orden INTEGER NOT NULL,
-    leccion_id INTEGER NOT NULL REFERENCES leccion(id) ON DELETE CASCADE
+    type VARCHAR(20) NOT NULL,
+    question TEXT NOT NULL,
+    image_src VARCHAR(255),
+    order_num INTEGER NOT NULL,
+    lesson_id INTEGER NOT NULL REFERENCES lesson(id) ON DELETE CASCADE
 );
 
--- Tabla Opción Reto
-CREATE TABLE opcion_reto (
+-- Crear tabla ChallengeOption (Opción de Reto)
+CREATE TABLE challenge_option (
     id SERIAL PRIMARY KEY,
-    texto TEXT NOT NULL,
-    correcto BOOLEAN NOT NULL,
-    imagen_src VARCHAR(255),
+    text TEXT NOT NULL,
+    is_correct BOOLEAN NOT NULL,
+    image_src VARCHAR(255),
     audio_src VARCHAR(255),
-    reto_id INTEGER NOT NULL REFERENCES reto(id) ON DELETE CASCADE
+    challenge_id INTEGER NOT NULL REFERENCES challenge(id) ON DELETE CASCADE
 );
 
--- Tabla Progreso Usuario
-CREATE TABLE progreso_usuario (
+-- Crear tabla UserProgress (Progreso del Usuario)
+CREATE TABLE user_progress (
     id SERIAL PRIMARY KEY,
-    curso_activo_id INTEGER NOT NULL REFERENCES curso(id) ON DELETE CASCADE,
-    usuario_id INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE
+    active_course_id INTEGER NOT NULL REFERENCES course(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE
 );
 
--- Tabla Progreso Reto
-CREATE TABLE progreso_reto (
+-- Crear tabla ChallengeProgress (Progreso del Reto)
+CREATE TABLE challenge_progress (
     id SERIAL PRIMARY KEY,
-    completado BOOLEAN NOT NULL,
-    reto_id INTEGER NOT NULL REFERENCES reto(id) ON DELETE CASCADE,
-    usuario_id INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE
+    completed BOOLEAN NOT NULL,
+    challenge_id INTEGER NOT NULL REFERENCES challenge(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE
 );
 
--- Tabla Logro
-CREATE TABLE logro (
+-- Crear tabla Achievement (Logro)
+CREATE TABLE achievement (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descripcion VARCHAR(255) NOT NULL,
-    imagen_src VARCHAR(255) NOT NULL,
-    experiencia_requerida INTEGER NOT NULL,
-    nivel_requerido INTEGER NOT NULL
+    title VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    image_src VARCHAR(255) NOT NULL,
+    required_experience INTEGER NOT NULL,
+    required_level INTEGER NOT NULL
 );
 
--- Tabla Logro Obtenido
-CREATE TABLE logro_obtenido (
+-- Crear tabla EarnedAchievement (Logro Obtenido)
+CREATE TABLE earned_achievement (
     id SERIAL PRIMARY KEY,
-    fecha_obtencion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    logro_id INTEGER NOT NULL REFERENCES logro(id) ON DELETE CASCADE,
-    usuario_id INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE
+    obtained_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    achievement_id INTEGER NOT NULL REFERENCES achievement(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE
 );
 
--- Índices para mejorar rendimiento
-CREATE INDEX idx_reto_leccion ON reto (leccion_id);
-CREATE INDEX idx_opcion_reto_reto ON opcion_reto (reto_id);
-CREATE INDEX idx_unidad_curso ON unidad (curso_id);
-CREATE INDEX idx_leccion_unidad ON leccion (unidad_id);
-CREATE INDEX idx_progreso_usuario_curso ON progreso_usuario (curso_activo_id);
-CREATE INDEX idx_progreso_usuario_usuario ON progreso_usuario (usuario_id);
-CREATE INDEX idx_progreso_reto_reto ON progreso_reto (reto_id);
-CREATE INDEX idx_progreso_reto_usuario ON progreso_reto (usuario_id);
-CREATE INDEX idx_logro_obtenido_logro ON logro_obtenido (logro_id);
-CREATE INDEX idx_logro_obtenido_usuario ON logro_obtenido (usuario_id);
+-- Crear tabla Mission (Misión)
+CREATE TABLE mission (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    granted_experience INTEGER NOT NULL DEFAULT 0
+);
+
+-- 🆕 Crear tabla DailyMission (Misiones del día)
+CREATE TABLE daily_mission (
+    id SERIAL PRIMARY KEY,
+    mission_id INTEGER NOT NULL REFERENCES mission(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    UNIQUE (mission_id, date)
+);
+
+-- 🔄 MODIFICADA: tabla UserMission (ahora relacionada con daily_mission)
+CREATE TABLE user_mission (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE,
+    daily_mission_id INTEGER NOT NULL REFERENCES daily_mission(id) ON DELETE CASCADE,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
+    completed_at TIMESTAMP
+);
+
+-- Crear tabla LessonProgress (Progreso de la Lección)
+CREATE TABLE lesson_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE,
+    lesson_id INTEGER NOT NULL REFERENCES lesson(id) ON DELETE CASCADE,
+    completed BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+-- Índices para mejorar el rendimiento
+CREATE INDEX idx_challenge_lesson ON challenge (lesson_id);
+CREATE INDEX idx_challenge_option_challenge ON challenge_option (challenge_id);
+CREATE INDEX idx_unit_course ON unit (course_id);
+CREATE INDEX idx_lesson_unit ON lesson (unit_id);
+CREATE INDEX idx_user_progress_course ON user_progress (active_course_id);
+CREATE INDEX idx_user_progress_user ON user_progress (user_id);
+CREATE INDEX idx_challenge_progress_challenge ON challenge_progress (challenge_id);
+CREATE INDEX idx_challenge_progress_user ON challenge_progress (user_id);
+CREATE INDEX idx_earned_achievement_achievement ON earned_achievement (achievement_id);
+CREATE INDEX idx_earned_achievement_user ON earned_achievement (user_id);
+CREATE INDEX idx_user_mission_user ON user_mission (user_id);
+CREATE INDEX idx_user_mission_daily ON user_mission (daily_mission_id);
+CREATE INDEX idx_lesson_progress_user ON lesson_progress (user_id);
+CREATE INDEX idx_lesson_progress_lesson ON lesson_progress (lesson_id);
 
 COMMIT;
 ```

@@ -1,4 +1,4 @@
-import { UserModel, UserProgressModel } from "../../database/prismaClient";
+import { UserModel, UserProgressModel,CourseModel  } from "../../database/prismaClient";
 import { UserSchema, UserType } from "./UserSchema";
 import { hashPassword } from "../../utils/hashPassword";
 
@@ -20,49 +20,53 @@ export const getUserByIdService = async (id: number) => {
 
 // Create a new user
 export const createUserService = async (userData: UserType) => {
-    // Validate user data using Zod schema
+    // Validar los datos del usuario
     const validatedUserData = UserSchema.parse(userData);
-
-    // Check if the email is already registered
+  
+    // Verificar si el email ya existe
     const existingUser = await UserModel.findUnique({
-        where: { email: validatedUserData.email },
+      where: { email: validatedUserData.email },
     });
-
+  
     if (existingUser) {
-        throw new Error("Email is already registered");
+      throw new Error("Email is already registered");
     }
-
-    // Hash the password before saving
+  
+    // Hashear la contraseña
     const hashedPassword = await hashPassword(validatedUserData.password);
-
-    // Create user in the database
+  
+    // Crear el usuario
     const newUser = await UserModel.create({
-        data: {
-            ...validatedUserData,
-            password: hashedPassword,
-        },
+      data: {
+        ...validatedUserData,
+        password: hashedPassword,
+      },
     });
-
-    // Add user progress for math and communication courses
-    const mathCourseId = 1;
-    const communicationCourseId = 2;
-
-    await UserProgressModel.create({
-        data: {
-            user_id: newUser.id,
-            active_course_id: mathCourseId,
+  
+    // Buscar cursos por título
+    const mathCourse = await CourseModel.findFirst({ where: { title: "Matemáticas" } });
+    const communicationCourse = await CourseModel.findFirst({ where: { title: "Comunicación" } });
+  
+    if (!mathCourse || !communicationCourse) {
+      throw new Error("Los cursos base no están registrados en la base de datos.");
+    }
+  
+    // Crear el progreso del usuario en ambos cursos
+    await UserProgressModel.createMany({
+      data: [
+        {
+          user_id: newUser.id,
+          active_course_id: mathCourse.id,
         },
-    });
-
-    await UserProgressModel.create({
-        data: {
-            user_id: newUser.id,
-            active_course_id: communicationCourseId,
+        {
+          user_id: newUser.id,
+          active_course_id: communicationCourse.id,
         },
+      ],
     });
-
+  
     return newUser;
-};
+  };
 
 // Delete a user
 export const deleteUserService = async (id: number) => {

@@ -44,6 +44,7 @@ CREATE TABLE challenge (
     id SERIAL PRIMARY KEY,
     type VARCHAR(20) NOT NULL,
     question TEXT NOT NULL,
+    image_src VARCHAR(255),
     order_num INTEGER NOT NULL,
     lesson_id INTEGER NOT NULL REFERENCES lesson(id) ON DELETE CASCADE
 );
@@ -99,11 +100,19 @@ CREATE TABLE mission (
     granted_experience INTEGER NOT NULL DEFAULT 0
 );
 
--- Crear tabla UserMission (Misión del Usuario)
+-- 🆕 Crear tabla DailyMission (Misiones del día)
+CREATE TABLE daily_mission (
+    id SERIAL PRIMARY KEY,
+    mission_id INTEGER NOT NULL REFERENCES mission(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    UNIQUE (mission_id, date)
+);
+
+-- 🔄 MODIFICADA: tabla UserMission (ahora relacionada con daily_mission)
 CREATE TABLE user_mission (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES user_account(id) ON DELETE CASCADE,
-    mission_id INTEGER NOT NULL REFERENCES mission(id) ON DELETE CASCADE,
+    daily_mission_id INTEGER NOT NULL REFERENCES daily_mission(id) ON DELETE CASCADE,
     completed BOOLEAN NOT NULL DEFAULT FALSE,
     completed_at TIMESTAMP
 );
@@ -128,7 +137,7 @@ CREATE INDEX idx_challenge_progress_user ON challenge_progress (user_id);
 CREATE INDEX idx_earned_achievement_achievement ON earned_achievement (achievement_id);
 CREATE INDEX idx_earned_achievement_user ON earned_achievement (user_id);
 CREATE INDEX idx_user_mission_user ON user_mission (user_id);
-CREATE INDEX idx_user_mission_mission ON user_mission (mission_id);
+CREATE INDEX idx_user_mission_daily ON user_mission (daily_mission_id);
 CREATE INDEX idx_lesson_progress_user ON lesson_progress (user_id);
 CREATE INDEX idx_lesson_progress_lesson ON lesson_progress (lesson_id);
 
