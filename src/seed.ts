@@ -270,31 +270,40 @@ async function main() {
   });
   
 
-  // Misiones
-  const mission1 = await prisma.mission.create({
-    data: {
-      title: "Completa tu primera lección",
-      description: "Completa cualquier lección para comenzar tu viaje de aprendizaje",
-      granted_experience: 10
-    }
-  });
-  
-  const mission2 = await prisma.mission.create({
-    data: {
-      title: "Estudiante dedicado",
-      description: "Completa 5 lecciones en un día",
-      granted_experience: 50
-    }
-  });
-  
-  const mission3 = await prisma.mission.create({
-    data: {
-      title: "Explorador de cursos",
-      description: "Completa lecciones en dos cursos diferentes",
-      granted_experience: 30
-    }
-  });
-  
+ // Misiones
+const mission1 = await prisma.mission.create({
+  data: {
+    title: "Completa tu primera lección",
+    description: "Completa cualquier lección para comenzar tu viaje de aprendizaje",
+    granted_experience: 10,
+    stat_key: "lessons_completed",
+    stat_condition: "gte",
+    stat_value: 1
+  }
+});
+
+const mission2 = await prisma.mission.create({
+  data: {
+    title: "Estudiante dedicado",
+    description: "Completa 5 lecciones en un día",
+    granted_experience: 50,
+    stat_key: "lessons_completed",
+    stat_condition: "gte",
+    stat_value: 5
+  }
+});
+
+const mission3 = await prisma.mission.create({
+  data: {
+    title: "Responde correctamente 15 preguntas",
+    description: "Demuestra tu conocimiento con 15 respuestas correctas",
+    granted_experience: 30,
+    stat_key: "correct_answers",
+    stat_condition: "gte",
+    stat_value: 15
+  }
+});
+
 
   // Misiones del día
   await prisma.daily_mission.createMany({

@@ -21,3 +21,8 @@ export const LessonProgressModel = prisma.lesson_progress;        // progreso_le
 export const ChallengeProgressModel = prisma.challenge_progress;  // progreso_reto
 export const UserProgressModel = prisma.user_progress;            // progreso_usuario
 export const DailyMissionModel = prisma.daily_mission;            // progreso_usuario
+
+//tablas score
+export const DailyUserStats = prisma.daily_user_stats;            // progreso_usuario
+export const DailyGeneralStats = prisma.user_general_stats;            // progreso_usuario
+
