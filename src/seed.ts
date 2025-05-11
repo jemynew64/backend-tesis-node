@@ -239,36 +239,66 @@ async function main() {
   });
 
   // Logros
-  const achievement1 = await prisma.achievement.create({
-    data: {
-      title: "Primer Paso",
-      description: "Completa tu primera lección",
-      image_src: "first-step.png",
-      required_experience: 10,
-      required_level: 1
-    }
-  });
-  
-   await prisma.achievement.create({
-    data: {
-      title: "Matemático Novato",
-      description: "Completa 5 lecciones de matemáticas",
-      image_src: "math-novice.png",
-      required_experience: 50,
-      required_level: 2
-    }
-  });
-  
-   await prisma.achievement.create({
-    data: {
-      title: "Escritor en Desarrollo",
-      description: "Completa 3 lecciones de comunicación",
-      image_src: "writer.png",
-      required_experience: 30,
-      required_level: 1
-    }
-  });
-  
+// 🎖️ Logro: Primer paso
+const achievement1 = await prisma.achievement.create({
+  data: {
+    title: "Primer Paso",
+    description: "Completa tu primera lección",
+    image_src: "first-step.png",
+    stat_key: "total_lessons",
+    stat_condition: "gte",
+    stat_value: 1
+  }
+});
+
+// 📘 Logro: Estudiante aplicado
+await prisma.achievement.create({
+  data: {
+    title: "Estudiante Aplicado",
+    description: "Completa 10 lecciones en total",
+    image_src: "student.png",
+    stat_key: "total_lessons",
+    stat_condition: "gte",
+    stat_value: 10
+  }
+});
+
+// 🧠 Logro: Responde correctamente 50 preguntas
+await prisma.achievement.create({
+  data: {
+    title: "Mente Ágil",
+    description: "Responde correctamente 50 preguntas",
+    image_src: "smart-mind.png",
+    stat_key: "total_correct_answers",
+    stat_condition: "gte",
+    stat_value: 50
+  }
+});
+
+// 🧪 Logro: Primer Quiz
+await prisma.achievement.create({
+  data: {
+    title: "Desafío Superado",
+    description: "Completa tu primer quiz",
+    image_src: "quiz-complete.png",
+    stat_key: "quizzes_completed",
+    stat_condition: "gte",
+    stat_value: 1
+  }
+});
+
+// 🧭 Logro: Explorador de unidades
+await prisma.achievement.create({
+  data: {
+    title: "Explorador de Unidades",
+    description: "Completa al menos 3 unidades",
+    image_src: "explorer.png",
+    stat_key: "total_units_completed",
+    stat_condition: "gte",
+    stat_value: 3
+  }
+});
+
 
  // Misiones
 const mission1 = await prisma.mission.create({

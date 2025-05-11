@@ -15,6 +15,7 @@ import misionRoutes from "./modules/Mission/Mission.routes";
 import misionUsuarioRoutes from "./modules/UserMission/UserMission.routes";
 import excelRoutes from "./modules/ImportExcel/importExcel.routes";
 import quizzRoutes from "./modules/quizz/Quiz.routes"
+import StatsRoutes from "./modules/Stats/Stats.routes"
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use("/api/reto", retoRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/excel", excelRoutes);
 app.use("/api/quizzpoints", quizzRoutes);
+app.use("/api/stats", StatsRoutes);
 
 // ✅ Servidor
 const PORT = Number(process.env.PORT) || 3000;

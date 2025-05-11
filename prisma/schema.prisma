@@ -8,13 +8,14 @@ datasource db {
 }
 
 model achievement {
-  id                  Int                  @id @default(autoincrement())
-  title               String               @db.VarChar(255)
-  description         String               @db.VarChar(255)
-  image_src           String               @db.VarChar(255)
-  required_experience Int
-  required_level      Int
-  earned_achievement  earned_achievement[]
+  id                 Int                  @id @default(autoincrement())
+  title              String               @db.VarChar(255)
+  description        String               @db.VarChar(255)
+  image_src          String               @db.VarChar(255)
+  stat_key           String               @db.VarChar(50)
+  stat_condition     String               @db.VarChar(10)
+  stat_value         Int
+  earned_achievement earned_achievement[]
 }
 
 model challenge {
