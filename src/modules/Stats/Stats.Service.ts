@@ -12,19 +12,33 @@ const dailyKeys = [
   "points_gained",
   "time_spent_minutes",
 ] as const;
+
 // Campos que pertenecen a la tabla general
-const generalKeys = [
-  "total_lessons",
-  "total_lessons_perfect",
-  "total_challenges",
-  "total_correct_answers",
-  "total_wrong_answers",
-  "total_units_completed",
-  "total_missions",
-  "total_points",
-  "total_experience",
-  "quizzes_completed",
-] as const;
+// const generalKeys = [
+//   "total_lessons",
+//   "total_lessons_perfect",
+//   "total_challenges",
+//   "total_correct_answers",
+//   "total_wrong_answers",
+//   "total_units_completed",
+//   "total_missions",
+//   "total_points",
+//   "total_experience",
+//   "quizzes_completed",
+// ] as const;
+
+// Mapeo entre campos diarios y generales
+const generalMapping: Record<string, string> = {
+  lessons_completed: "total_lessons",
+  lessons_perfect: "total_lessons_perfect",
+  challenges_completed: "total_challenges",
+  correct_answers: "total_correct_answers",
+  wrong_answers: "total_wrong_answers",
+  experience_gained: "total_experience",
+  points_gained: "total_points",
+  quizzes_completed: "quizzes_completed",
+  // Otros campos como units/missions se actualizan desde otros procesos
+};
 
 // Servicio principal
 export const updateUserStatsService = async (userId: number, stats: StatsInput) => {
@@ -39,7 +53,7 @@ export const updateUserStatsService = async (userId: number, stats: StatsInput) 
       user_id_date: { user_id: userId, date: today },
     },
   });
-  
+
   if (existingDaily) {
     const updateData: any = {};
 
@@ -68,31 +82,33 @@ export const updateUserStatsService = async (userId: number, stats: StatsInput) 
     });
   }
 
-  // 2. Actualizar o crear stats generales
+  // 2. Actualizar o crear stats generales usando el mapeo
   const existingGeneral = await DailyGeneralStats.findUnique({
     where: { user_id: userId },
   });
 
+  const mappedUpdateData: any = {};
+
+  Object.entries(generalMapping).forEach(([dailyKey, generalKey]) => {
+    if (parsedStats[dailyKey as keyof StatsInput] !== undefined) {
+      mappedUpdateData[generalKey] = {
+        increment: parsedStats[dailyKey as keyof StatsInput]!,
+      };
+    }
+  });
+
   if (existingGeneral) {
-    const updateData: any = {};
-
-    generalKeys.forEach((key) => {
-      if (parsedStats[key] !== undefined) {
-        updateData[key] = { increment: parsedStats[key] };
-      }
-    });
-
     await DailyGeneralStats.update({
       where: { user_id: userId },
-      data: updateData,
+      data: mappedUpdateData,
     });
   } else {
     const createData: any = {
       user_id: userId,
     };
 
-    generalKeys.forEach((key) => {
-      createData[key] = parsedStats[key] ?? 0;
+    Object.entries(generalMapping).forEach(([dailyKey, generalKey]) => {
+      createData[generalKey] = parsedStats[dailyKey as keyof StatsInput] ?? 0;
     });
 
     await DailyGeneralStats.create({

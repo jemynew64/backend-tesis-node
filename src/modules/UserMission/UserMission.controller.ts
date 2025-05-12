@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserMissionService, createUserMissionService, getUserMissionByIdService, updateUserMissionService, deleteUserMissionService,getUserMissionsTodayService} from "./UserMission.service";
+import { getUserMissionService, createUserMissionService, getUserMissionByIdService, updateUserMissionService, deleteUserMissionService,getUserMissionsTodayService,checkAndMarkUserMissionsService } from "./UserMission.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get user missions with pagination
@@ -92,3 +92,20 @@ export const getUserMissionsTodayHandler = async (req: Request, res: Response) =
     }
   };
   
+//controlador para verificar si se han echo o no las misiones 
+  export const checkAndMarkUserMissionsHandler = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+       res.status(401).json({ message: "No autorizado" });
+       return;
+    }
+
+    const result = await checkAndMarkUserMissionsService(userId);
+    res.status(200).json({
+      message: `${result.completed} misiones completadas`,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};

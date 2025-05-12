@@ -23,6 +23,6 @@ export const UserProgressModel = prisma.user_progress;            // progreso_us
 export const DailyMissionModel = prisma.daily_mission;            // progreso_usuario
 
 //tablas score
-export const DailyUserStats = prisma.daily_user_stats;            // progreso_usuario
-export const DailyGeneralStats = prisma.user_general_stats;            // progreso_usuario
+export const DailyUserStats = prisma.daily_user_stats;           
+export const DailyGeneralStats = prisma.user_general_stats;            
 

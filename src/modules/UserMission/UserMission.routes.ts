@@ -5,7 +5,8 @@ import {
   getUserMissionByIdHandler,
   updateUserMissionHandler,
   deleteUserMissionHandler,
-  getUserMissionsTodayHandler, // 👈 IMPORTA esto
+  getUserMissionsTodayHandler, 
+  checkAndMarkUserMissionsHandler 
 } from "./UserMission.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 
@@ -18,5 +19,8 @@ router.post("/", authenticate, createUserMissionHandler);
 router.get("/:id", authenticate, getUserMissionByIdHandler);
 router.put("/:id", authenticate, updateUserMissionHandler);
 router.delete("/:id", authenticate, deleteUserMissionHandler);
+
+//para verificar si la usuario mision se completo o no 
+router.post("/check", authenticate, checkAndMarkUserMissionsHandler);
 
 export default router;
