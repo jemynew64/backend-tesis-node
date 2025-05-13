@@ -1,5 +1,18 @@
-import { DailyUserStats, DailyGeneralStats } from "../../database/prismaClient";
+import { DailyUserStats, GeneralStatsModel } from "../../database/prismaClient";
 import { StatsInput, StatsSchema } from "./Stats.schema";
+
+export const getUserStatsService = async (userId: number) => {
+  const generalStats = await GeneralStatsModel.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (!generalStats) {
+    throw new Error("No se encontraron estadísticas generales para este usuario.");
+  }
+
+  return generalStats;
+};
+
 
 // Campos que pertenecen a la tabla diaria
 const dailyKeys = [
@@ -83,7 +96,7 @@ export const updateUserStatsService = async (userId: number, stats: StatsInput) 
   }
 
   // 2. Actualizar o crear stats generales usando el mapeo
-  const existingGeneral = await DailyGeneralStats.findUnique({
+  const existingGeneral = await GeneralStatsModel.findUnique({
     where: { user_id: userId },
   });
 
@@ -98,7 +111,7 @@ export const updateUserStatsService = async (userId: number, stats: StatsInput) 
   });
 
   if (existingGeneral) {
-    await DailyGeneralStats.update({
+    await GeneralStatsModel.update({
       where: { user_id: userId },
       data: mappedUpdateData,
     });
@@ -111,7 +124,7 @@ export const updateUserStatsService = async (userId: number, stats: StatsInput) 
       createData[generalKey] = parsedStats[dailyKey as keyof StatsInput] ?? 0;
     });
 
-    await DailyGeneralStats.create({
+    await GeneralStatsModel.create({
       data: createData,
     });
   }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { updateUserStatsService } from "./Stats.Service";
+import { updateUserStatsService,getUserStatsService } from "./Stats.Service";
 
 export const updateStatsController = async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
@@ -21,5 +21,22 @@ export const updateStatsController = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("❌ Error actualizando estadísticas:", error);
     res.status(500).json({ message: "Error actualizando estadísticas", error });
+  }
+};
+
+export const getStatsController = async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+
+  if (!userId) {
+     res.status(401).json({ message: "No autorizado" });
+     return;
+  }
+
+  try {
+    const stats = await getUserStatsService(parseInt(userId));
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("❌ Error obteniendo estadísticas:", error);
+    res.status(500).json({ message: "Error obteniendo estadísticas", error });
   }
 };
