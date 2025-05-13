@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { updateUserStatsService,getUserStatsService } from "./Stats.Service";
+import { updateUserStatsService,getUserStatsService,getUserStatsDiarioService } from "./Stats.Service";
 
 export const updateStatsController = async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
@@ -36,7 +36,24 @@ export const getStatsController = async (req: Request, res: Response) => {
     const stats = await getUserStatsService(parseInt(userId));
     res.status(200).json(stats);
   } catch (error) {
-    console.error("❌ Error obteniendo estadísticas:", error);
+    console.error("❌ Error obteniendo estadísticas generales :", error);
+    res.status(500).json({ message: "Error obteniendo estadísticas", error });
+  }
+};
+
+export const getStatsdiaryController = async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+
+  if (!userId) {
+     res.status(401).json({ message: "No autorizado" });
+     return;
+  }
+
+  try {
+    const stats = await getUserStatsDiarioService(parseInt(userId));
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("❌ Error obteniendo estadísticas diarias:", error);
     res.status(500).json({ message: "Error obteniendo estadísticas", error });
   }
 };
