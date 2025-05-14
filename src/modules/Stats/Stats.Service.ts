@@ -1,6 +1,31 @@
 import { DailyUserStats, GeneralStatsModel } from "../../database/prismaClient";
 import { StatsInput, StatsSchema } from "./Stats.schema";
 
+export const getAllUserDailyStatsService = async (userId: number) => {
+  const allStats = await DailyUserStats.findMany({
+    where: {
+      user_id: userId,
+    },
+    orderBy: {
+      date: "asc", // opcional, pero útil para gráficas
+    },
+    select: {
+      date: true,
+      lessons_completed: true,
+      lessons_perfect: true,
+      challenges_completed: true,
+      correct_answers: true,
+      wrong_answers: true,
+      experience_gained: true,
+      points_gained: true,
+      time_spent_minutes: true,
+    }
+  });
+
+  return allStats;
+};
+
+
 export const getUserStatsService = async (userId: number) => {
   const generalStats = await GeneralStatsModel.findUnique({
     where: { user_id: userId },
