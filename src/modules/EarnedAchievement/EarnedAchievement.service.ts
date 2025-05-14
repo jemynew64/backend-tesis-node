@@ -67,7 +67,7 @@ export const autoAssignAchievements = async (userId: number) => {
       throw new Error("User stats not found");
     }
 
-    const logrosYaGanados = new Set(logrosGanados.map((l) => l.achievement_id));
+    const logrosYaGanados = new Set(logrosGanados.map((l:EarnedAchievementType) => l.achievement_id));
     const nuevosLogros = [];
 
     for (const logro of logros) {

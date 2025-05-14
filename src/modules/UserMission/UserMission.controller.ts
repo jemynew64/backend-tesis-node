@@ -81,7 +81,7 @@ export const getUserMissionsTodayHandler = async (req: Request, res: Response) =
       const missions = await getUserMissionsTodayService(userId);
   
       res.status(200).json(
-        missions.map((m) => ({
+      missions.map((m: { id: number; completed: boolean; daily_mission: { mission: any } }) => ({
           id: m.id,
           completed: m.completed,
           mission: m.daily_mission.mission,

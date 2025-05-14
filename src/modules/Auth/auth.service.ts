@@ -7,6 +7,8 @@ import {
   UserMissionModel,
 } from "../../database/prismaClient";
 import { generateToken } from "../../utils/jwt";
+import { MissionType} from "../types/TypeGeneral"
+
 
 // 🔍 Buscar usuario por email
 export const findUserByEmail = async (email: string) => {
@@ -45,10 +47,10 @@ export const generateDailyMissionsIfNeeded = async () => {
     const shuffled = allMissions.sort(() => 0.5 - Math.random()).slice(0, 3);
 
     await DailyMissionModel.createMany({
-      data: shuffled.map((m) => ({ mission_id: m.id, date: today })),
+      data: shuffled.map((m: MissionType) => ({ mission_id: m.id, date: today })),
     });
 
-    console.log("✅ Misiones diarias generadas:", shuffled.map((m) => m.title));
+    console.log("✅ Misiones diarias generadas:", shuffled.map((m: MissionType) => m.title));
   } else {
     console.log("🟡 Ya existen misiones diarias para hoy.");
   }
