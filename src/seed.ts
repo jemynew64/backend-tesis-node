@@ -26,14 +26,14 @@ async function main() {
   const mathCourse = await prisma.course.create({
     data: {
       title: "Matemáticas",
-      image_src: "matematicas.png",
+      image_src: "/images/iconosuma.png",
     },
   });
 
   const communicationCourse = await prisma.course.create({
     data: {
       title: "Comunicación",
-      image_src: "comunicacion.png",
+      image_src: "/images/iconolibro.png",
     },
   });
 

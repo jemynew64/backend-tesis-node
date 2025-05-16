@@ -24,20 +24,29 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Configuración dinámica de CORS
 const allowedOrigins = [
-  process.env.CORS_ORIGIN || "http://localhost:5173", // fallback para desarrollo local
-];
+  "http://localhost:5173",
+  "http://localhost",
+  ...((process.env.CORS_ORIGIN || "").split(",").map(o => o.trim())),
+].filter(Boolean); // elimina undefined o falsy
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+    // Permitir peticiones sin origin (como Postman o curl)
+    if (!origin) {
+      return callback(null, true);
     }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.warn(`❌ Origin not allowed by CORS: ${origin}`);
+    return callback(new Error("Not allowed by CORS"));
   },
-methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 };
+
 
 app.use(cors(corsOptions));
 
