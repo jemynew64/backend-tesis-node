@@ -25,21 +25,27 @@ export const updateStatsController = async (req: Request, res: Response) => {
 };
 
 export const getStatsController = async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  //solo lo modifique para hacer que el admin pueda mandar
+  const indicatedId = req.query.usuarioindicadoid as string | undefined;
+  const userIdFromToken = (req as any).user?.id;
 
-  if (!userId) {
+  // Determinar qué ID usar
+  const finalUserId = indicatedId && indicatedId.trim() !== "" ? parseInt(indicatedId) : userIdFromToken;
+
+  if (!finalUserId) {
      res.status(401).json({ message: "No autorizado" });
      return;
   }
 
   try {
-    const stats = await getUserStatsService(parseInt(userId));
+    const stats = await getUserStatsService(parseInt(finalUserId));
     res.status(200).json(stats);
   } catch (error) {
-    console.error("❌ Error obteniendo estadísticas generales :", error);
+    console.error("❌ Error obteniendo estadísticas generales:", error);
     res.status(500).json({ message: "Error obteniendo estadísticas", error });
   }
 };
+
 
 export const getStatsdiaryController = async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
@@ -59,15 +65,18 @@ export const getStatsdiaryController = async (req: Request, res: Response) => {
 };
 
 export const getStatstotaldiaryController = async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const indicatedId = req.query.usuarioindicadoid as string | undefined;
+  const userIdFromToken = (req as any).user?.id;
 
-  if (!userId) {
+  const finalUserId = indicatedId && indicatedId.trim() !== "" ? parseInt(indicatedId) : userIdFromToken;
+
+  if (!finalUserId || isNaN(finalUserId)) {
      res.status(401).json({ message: "No autorizado" });
      return;
   }
 
   try {
-    const stats = await getAllUserDailyStatsService(parseInt(userId));
+    const stats = await getAllUserDailyStatsService(finalUserId);
     res.status(200).json(stats);
   } catch (error) {
     console.error("❌ Error obteniendo estadísticas diarias:", error);
