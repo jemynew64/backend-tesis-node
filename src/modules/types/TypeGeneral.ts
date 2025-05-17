@@ -126,6 +126,7 @@ export type DailyUserStatsType = {
   experience_gained: number;
   points_gained: number;
   time_spent_minutes: number;
+  quizzes_completed: number;
 };
 
 export type UserGeneralStatsType = {

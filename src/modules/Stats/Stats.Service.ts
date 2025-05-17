@@ -19,6 +19,7 @@ export const getAllUserDailyStatsService = async (userId: number) => {
       experience_gained: true,
       points_gained: true,
       time_spent_minutes: true,
+      quizzes_completed: true, 
     }
   });
 
@@ -75,6 +76,7 @@ export const getUserStatsDiarioService = async (userId: number) => {
       experience_gained: 0,
       points_gained: 0,
       time_spent_minutes: 0,
+      quizzes_completed: 0, // ✅ NUEVO
     };
   }
 
@@ -94,6 +96,7 @@ const dailyKeys = [
   "experience_gained",
   "points_gained",
   "time_spent_minutes",
+  "quizzes_completed", // ✅ NUEVO
 ] as const;
 
 // Campos que pertenecen a la tabla general
