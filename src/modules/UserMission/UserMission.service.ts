@@ -1,4 +1,4 @@
-import { UserMissionModel,DailyUserStats } from "../../database/prismaClient";
+import { UserMissionModel,DailyUserStats,GeneralStatsModel } from "../../database/prismaClient";
 import { UserMissionSchema, UserMissionType } from "../../schemas/index";
 import { startOfToday } from "date-fns";
 
@@ -129,6 +129,7 @@ export const checkAndMarkUserMissionsService = async (userId: number) => {
     }
 
     if (valid) {
+      // ✅ Marcar como completada
       await UserMissionModel.update({
         where: { id: um.id },
         data: {
@@ -136,6 +137,17 @@ export const checkAndMarkUserMissionsService = async (userId: number) => {
           completed_at: new Date(),
         },
       });
+
+      // ✅ Incrementar total_missions
+      await GeneralStatsModel.update({
+        where: { user_id: userId },
+        data: {
+          total_missions: {
+            increment: 1,
+          },
+        },
+      });
+
       completedCount++;
       console.log(`✅ Misión ${mission.id} marcada como completada.`);
     } else {

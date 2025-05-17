@@ -39,3 +39,18 @@ export async function QuizUserPoint(user_id: number, lesson_id: number) {
       experience,
   };
 }
+
+export async function checkLessonCompleted(user_id: number, lesson_id: number) {
+  const lessonProgress = await LessonProgressModel.findFirst({
+    where: {
+      user_id,
+      lesson_id,
+    },
+  });
+
+  if (!lessonProgress) {
+    return false; // No se encontró progreso, se asume no completado
+  }
+
+  return lessonProgress.completed;
+}
