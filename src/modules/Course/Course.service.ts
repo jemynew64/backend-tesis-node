@@ -1,4 +1,4 @@
-import { CourseModel } from "../../database/prismaClient";
+import { CourseModel  } from "../../database/prismaClient";
 import { CourseSchema, CourseType } from "./CourseSchema";
 
 export const findAllCourses = async (page: number, limit: number) => {
@@ -63,24 +63,26 @@ export const courseidunitlesson = async (id: number, user_id: number) => {
 
 // Función para obtener el curso con sus lecciones desbloqueadas por usuario
 export const courseWithUnlockedLessons = async (courseId: number, userId: number) => {
-  // 1️⃣ Buscamos el curso por su ID
   const course = await CourseModel.findFirst({
     where: { id: courseId },
     select: {
-      title: true, // Solo traemos el título del curso
+      title: true,
       unit: {
-        orderBy: { order_num: "asc" }, // Ordenamos las unidades por su número
+        orderBy: { order_num: "asc" },
         select: {
+          id: true,
           title: true,
           description: true,
+          order_num: true,
           lesson: {
-            orderBy: { order_num: "asc" }, // Ordenamos lecciones dentro de la unidad
+            orderBy: { order_num: "asc" },
             select: {
               id: true,
               title: true,
+              order_num: true,
               lesson_progress: {
-                where: { user_id: userId }, // Solo traemos el progreso del usuario actual
-                select: { completed: true }, // Solo nos interesa si está completada
+                where: { user_id: userId },
+                select: { completed: true },
               },
             },
           },
@@ -89,36 +91,37 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
     },
   });
 
-  // 2️⃣ Si no se encuentra el curso, devolvemos null
-  if (!course) return null;
+  if (!course) return [];
 
-  // 3️⃣ Construimos manualmente la estructura de respuesta con el estado de desbloqueo
   const courseWithStatus = {
     title: course.title,
-    unit: course.unit.map((unit: any) => {
-      // Para cada unidad, procesamos las lecciones
-      const lessonWithStatus = unit.lesson.map((lesson: any, index: number, array: any[]) => {
-        const isFirst = index === 0; // La primera lección siempre está desbloqueada
-        const previousCompleted = isFirst || array[index - 1].lesson_progress?.[0]?.completed;
+    unit: course.unit.map((unit, unitIndex, allUnits) => {
+      const isFirstUnit = unitIndex === 0;
 
-        // Traducción humana
-        // Si estoy en la primera lección → desbloqueada.
-        // Sino:
-        //   Reviso la lección anterior:
-        //     ¿Tiene progreso?
-        //     ¿Ese progreso está completado?
-        //       ✔️ Sí → desbloqueada
-        //       ❌ No o undefined → bloqueada
+      // ✅ Verificamos si TODAS las lecciones de la unidad anterior están completadas
+      const previousUnitCompleted = isFirstUnit || allUnits[unitIndex - 1].lesson.every(
+        (l) => l.lesson_progress?.[0]?.completed === true
+      );
+
+      const lessonWithStatus = unit.lesson.map((lesson, lessonIndex, lessonArray) => {
+        const isFirstLesson = lessonIndex === 0;
+
+        const unlocked = isFirstUnit && isFirstLesson
+          ? true
+          : isFirstLesson
+            ? previousUnitCompleted
+            : lessonArray[lessonIndex - 1].lesson_progress?.[0]?.completed === true;
+
         return {
           id: lesson.id,
           title: lesson.title,
-          completed: lesson.lesson_progress?.[0]?.completed || false, // Estado actual
-          unlocked: isFirst || previousCompleted, // Desbloqueada si es la primera o si la anterior está completada
+          completed: lesson.lesson_progress?.[0]?.completed || false,
+          unlocked,
         };
       });
 
-      // Hasta acá es de lesson
       return {
+        id: unit.id,
         title: unit.title,
         description: unit.description,
         lesson: lessonWithStatus,

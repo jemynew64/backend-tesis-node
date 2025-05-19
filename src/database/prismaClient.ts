@@ -25,4 +25,5 @@ export const DailyMissionModel = prisma.daily_mission;            // progreso_us
 //tablas score
 export const DailyUserStats = prisma.daily_user_stats;           
 export const GeneralStatsModel = prisma.user_general_stats;            
+export const UserUnitProgressModel = prisma.unit_progress;            
 
