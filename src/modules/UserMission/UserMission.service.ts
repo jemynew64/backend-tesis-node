@@ -1,4 +1,4 @@
-import { UserMissionModel,DailyUserStats,GeneralStatsModel } from "../../database/prismaClient";
+import { UserMissionModel,DailyUserStats,GeneralStatsModel,UserModel } from "../../database/prismaClient";
 import { UserMissionSchema, UserMissionType } from "../../schemas/index";
 import { startOfToday } from "date-fns";
 
@@ -128,29 +128,61 @@ export const checkAndMarkUserMissionsService = async (userId: number) => {
       case "eq":  valid = value === mission.stat_value; break;
     }
 
-    if (valid) {
-      // ✅ Marcar como completada
-      await UserMissionModel.update({
-        where: { id: um.id },
-        data: {
-          completed: true,
-          completed_at: new Date(),
-        },
-      });
+if (valid) {
+  const expToAdd = mission.granted_experience;
+  const pointsToAdd = mission.granted_experience;
 
-      // ✅ Incrementar total_missions
-      await GeneralStatsModel.update({
-        where: { user_id: userId },
-        data: {
-          total_missions: {
-            increment: 1,
-          },
-        },
-      });
+  // ✅ Marcar misión como completada
+  await UserMissionModel.update({
+    where: { id: um.id },
+    data: {
+      completed: true,
+      completed_at: new Date(),
+    },
+  });
 
-      completedCount++;
-      console.log(`✅ Misión ${mission.id} marcada como completada.`);
-    } else {
+  // ✅ Actualizar stats diarios (primero obtenemos el ID)
+  const stats = await DailyUserStats.findFirst({
+    where: {
+      user_id: userId,
+      date: today,
+    },
+  });
+
+  if (stats) {
+    await DailyUserStats.update({
+      where: { id: stats.id },
+      data: {
+        experience_gained: { increment: expToAdd },
+        points_gained: { increment: pointsToAdd },
+      },
+    });
+  }
+
+  // ✅ Actualizar stats generales
+  await GeneralStatsModel.update({
+    where: { user_id: userId },
+    data: {
+      total_experience: { increment: expToAdd },
+      total_points: { increment: pointsToAdd },
+      total_missions: { increment: 1 },
+    },
+  });
+
+  // ✅ Actualizar cuenta del usuario
+  await UserModel.update({
+    where: { id: userId },
+    data: {
+      experience: { increment: expToAdd },
+      points: { increment: pointsToAdd },
+    },
+  });
+
+  completedCount++;
+  console.log(`✅ Misión ${mission.id} completada: +${expToAdd} EXP, +${pointsToAdd} PTS`);
+}
+
+ else {
       console.log(`❌ Misión ${mission.id} aún no cumple los requisitos.`);
     }
   }
