@@ -17,7 +17,7 @@ import excelRoutes from "./modules/ImportExcel/importExcel.routes";
 import quizzRoutes from "./modules/quizz/Quiz.routes"
 import StatsRoutes from "./modules/Stats/Stats.routes"
 import unitProgressRoutes from "./modules/UnitProgress/UnitProgress.routes"
-
+import shopRoutes from "./modules/shop/Shop.routes"
 const app = express();
 
 app.use(express.json());
@@ -68,6 +68,7 @@ app.use("/api/excel", excelRoutes);
 app.use("/api/quizzpoints", quizzRoutes);
 app.use("/api/stats", StatsRoutes);
 app.use("/api/unitprogress", unitProgressRoutes);
+app.use("/api/shop", shopRoutes);
 
 // ✅ Servidor
 const PORT = Number(process.env.PORT) || 3000;
