@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService } from "./User.service";
+import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService,ReducerliveService } from "./User.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get all users with pagination
@@ -59,6 +59,16 @@ export const updateUserHandler = async (req: Request, res: Response) => {
         const userData = req.body;
         const updatedUser = await updateUserService(Number(id), userData);
         res.status(200).json(updatedUser);
+    } catch (error) {
+        handleErrorResponse(res, error);
+    }
+};
+
+export const ReducerliveController = async (req: Request, res: Response) => {
+    try {
+        const userIdFromToken = (req as any).user?.id;
+        const newUser = await ReducerliveService(userIdFromToken);
+        res.status(201).json(newUser);
     } catch (error) {
         handleErrorResponse(res, error);
     }

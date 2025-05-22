@@ -1,6 +1,7 @@
 import { UserModel, UserProgressModel,CourseModel  } from "../../database/prismaClient";
 import { UserSchema, UserType } from "./UserSchema";
 import { hashPassword } from "../../utils/hashPassword";
+import { scheduleHeartRecovery } from "./heartRecoveryTimer"; // ✅ importa
 
 // Get all users with pagination
 export const getUsersService = async (page: number, limit: number) => {
@@ -98,4 +99,25 @@ export const updateUserService = async (id: number, userData: Partial<UserType>)
     });
 
     return updatedUser;
+};
+
+export const ReducerliveService = async (id: number) => {
+  const user = await UserModel.findUnique({ where: { id } });
+
+  if (!user) throw new Error("User not found");
+  if (user.hearts <= 0) throw new Error("User has no remaining life");
+
+  const updatedUser = await UserModel.update({
+    where: { id },
+    data: {
+      hearts: user.hearts - 1,
+    },
+  });
+
+  // 🕒 Programar recuperación si es necesario
+  if (updatedUser.hearts < 5) {
+    scheduleHeartRecovery(updatedUser.id);
+  }
+
+  return updatedUser;
 };
