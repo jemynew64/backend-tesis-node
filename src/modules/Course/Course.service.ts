@@ -98,13 +98,13 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
     unit: course.unit.map((unit, unitIndex, allUnits) => {
       const isFirstUnit = unitIndex === 0;
 
-      // ✅ Verificamos si TODAS las lecciones de la unidad anterior están completadas
       const previousUnitCompleted = isFirstUnit || allUnits[unitIndex - 1].lesson.every(
         (l) => l.lesson_progress?.[0]?.completed === true
       );
 
       const lessonWithStatus = unit.lesson.map((lesson, lessonIndex, lessonArray) => {
         const isFirstLesson = lessonIndex === 0;
+        const Eslaultimaleccion = lessonIndex === lessonArray.length - 1;
 
         const unlocked = isFirstUnit && isFirstLesson
           ? true
@@ -112,12 +112,14 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
             ? previousUnitCompleted
             : lessonArray[lessonIndex - 1].lesson_progress?.[0]?.completed === true;
 
-        return {
+        const base = {
           id: lesson.id,
           title: lesson.title,
           completed: lesson.lesson_progress?.[0]?.completed || false,
           unlocked,
         };
+
+        return Eslaultimaleccion ? { ...base, examen: true } : base;
       });
 
       return {

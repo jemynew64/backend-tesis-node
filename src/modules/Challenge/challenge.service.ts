@@ -1,4 +1,4 @@
-import { ChallengeModel } from "../../database/prismaClient";
+import { ChallengeModel,LessonModel  } from "../../database/prismaClient";
 import { ChallengeSchema, ChallengeType } from "./ChallengeSchema";
 
 export const findChallengesByLessonId = async (lesson_id: number) => {
@@ -9,13 +9,42 @@ export const findChallengesByLessonId = async (lesson_id: number) => {
 };
 
 export const findquizzez = async (lesson_id: number) => {
-  return await ChallengeModel.findMany({
+  // 1️⃣ Obtener la lección actual para saber su unidad y order_num
+  const currentLesson = await LessonModel.findUnique({
+    where: { id: lesson_id },
+    select: {
+      id: true,
+      order_num: true,
+      unit_id: true,
+    },
+  });
+
+  if (!currentLesson) return [];
+
+  // 2️⃣ Obtener la última lección de esa unidad (por order_num)
+  const lastLesson = await LessonModel.findFirst({
+    where: { unit_id: currentLesson.unit_id },
+    orderBy: { order_num: "desc" },
+    select: { id: true },
+  });
+
+  // 3️⃣ Verificamos si es la última
+  const isLastLesson = currentLesson.id === lastLesson?.id;
+
+  // 4️⃣ Buscar los challenges normales
+  const challenges = await ChallengeModel.findMany({
     where: { lesson_id },
     orderBy: { order_num: "asc" },
     include: {
-      challenge_option: true, // 👈 esto incluye todas las opciones relacionadas
+      challenge_option: true,
     },
   });
+
+  // 5️⃣ Retornar challenges y marca adicional
+  return {
+    isLastLesson,
+    challenges,
+  };
 };
 
 export const findAllChallenges = async (page = 1, limit = 10) => {

@@ -76,22 +76,24 @@ export const getChallengesByLessonId = async (req: Request, res: Response) => {
   }
 };
 
+
 //para los quizz
 export const getQuizzBychallengeId = async (req: Request, res: Response) => {
   try {
     //recibo por params el id de la leccion
     const { lesson_id } = req.params;
     const quizz = await findquizzez(Number(lesson_id));
-    if (!quizz || quizz.length === 0) {
-       res.status(404).json({ message: "No se encontraron los quizz para esta lección." });
+    if (!quizz) {
+      res.status(404).json({ message: "Quizz no encontrada" });
       return;
-
     }
     res.status(200).json(quizz);
   } catch (error) {
     handleErrorResponse(res, error);
   }
 };
+
+
 export const uploadImage = async (
   req: Request & { file?: Express.Multer.File },
   res: Response
