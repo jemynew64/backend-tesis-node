@@ -139,6 +139,7 @@ model user_account {
   challenge_progress challenge_progress[]
   daily_user_stats   daily_user_stats[]
   earned_achievement earned_achievement[]
+  heart_recovery     heart_recovery[]
   lesson_progress    lesson_progress[]
   unit_progress      unit_progress[]
   user_general_stats user_general_stats?
@@ -228,4 +229,13 @@ model unit_progress {
   @@unique([user_id, unit_id])
   @@index([unit_id], map: "idx_unit_progress_unit")
   @@index([user_id], map: "idx_unit_progress_user")
+}
+
+model heart_recovery {
+  id           Int          @id @default(autoincrement())
+  user_id      Int
+  recover_at   DateTime     @db.Timestamp(6)
+  user_account user_account @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_heart_recovery_user")
 }

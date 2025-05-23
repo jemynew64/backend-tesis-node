@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService,ReducerliveService } from "./User.service";
+import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService,ReducerliveService,getHeartsPendingService  } from "./User.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get all users with pagination
@@ -19,6 +19,7 @@ export const getUsersHandler = async (req: Request, res: Response) => {
 export const getUserByIdHandler = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        console.log("ID: mandado por aca ", id);
         const user = await getUserByIdService(Number(id));
         if (!user) {
             res.status(404).json({ message: "User not found" });
@@ -72,4 +73,14 @@ export const ReducerliveController = async (req: Request, res: Response) => {
     } catch (error) {
         handleErrorResponse(res, error);
     }
+};
+
+export const getHeartsPendingHandler = async (req: Request, res: Response) => {
+  try {
+    const userIdFromToken = (req as any).user?.id;
+    const data = await getHeartsPendingService(userIdFromToken);
+    res.status(200).json(data);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
 };

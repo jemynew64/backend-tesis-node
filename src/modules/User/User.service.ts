@@ -1,7 +1,6 @@
-import { UserModel, UserProgressModel,CourseModel  } from "../../database/prismaClient";
+import { UserModel, UserProgressModel,CourseModel,prisma ,heart_recoveryModel  } from "../../database/prismaClient";
 import { UserSchema, UserType } from "./UserSchema";
 import { hashPassword } from "../../utils/hashPassword";
-import { scheduleHeartRecovery } from "./heartRecoveryTimer"; // ✅ importa
 
 // Get all users with pagination
 export const getUsersService = async (page: number, limit: number) => {
@@ -14,10 +13,49 @@ export const getUsersService = async (page: number, limit: number) => {
 
 // Get user by ID
 export const getUserByIdService = async (id: number) => {
-    return await UserModel.findUnique({
+  const now = new Date();
+
+  const user = await UserModel.findUnique({ where: { id } });
+  if (!user) throw new Error("User not found");
+
+  const maxHearts = 5;
+
+  const heartsToRestore = await heart_recoveryModel.findMany({
+    where: {
+      user_id: id,
+      recover_at: { lte: now },
+    },
+    orderBy: { recover_at: "asc" },
+  });
+
+  const spaceLeft = maxHearts - user.hearts;
+
+  if (heartsToRestore.length > 0 && spaceLeft > 0) {
+    const toRestore = heartsToRestore.slice(0, spaceLeft);
+
+    await prisma.$transaction([
+      UserModel.update({
         where: { id },
-    });
+        data: {
+          hearts: {
+            increment: toRestore.length,
+          },
+        },
+      }),
+      heart_recoveryModel.deleteMany({
+        where: {
+          id: {
+            in: toRestore.map(h => h.id),
+          },
+        },
+      }),
+    ]);
+  }
+
+  return await UserModel.findUnique({ where: { id } });
 };
+
+
 
 // Create a new user
 export const createUserService = async (userData: UserType) => {
@@ -103,21 +141,54 @@ export const updateUserService = async (id: number, userData: Partial<UserType>)
 
 export const ReducerliveService = async (id: number) => {
   const user = await UserModel.findUnique({ where: { id } });
-
   if (!user) throw new Error("User not found");
   if (user.hearts <= 0) throw new Error("User has no remaining life");
 
-  const updatedUser = await UserModel.update({
-    where: { id },
-    data: {
-      hearts: user.hearts - 1,
-    },
+  const newHearts = user.hearts - 1;
+
+  // Obtener el último recover_at programado para este usuario
+  const lastRecovery = await heart_recoveryModel.findFirst({
+    where: { user_id: id },
+    orderBy: { recover_at: 'desc' },
   });
 
-  // 🕒 Programar recuperación si es necesario
-  if (updatedUser.hearts < 5) {
-    scheduleHeartRecovery(updatedUser.id);
-  }
+  // Si no hay ninguna recuperación pendiente, base = ahora
+  const baseTime = lastRecovery ? new Date(lastRecovery.recover_at) : new Date();
+
+  // Nueva recuperación programada exactamente +5 minutos después de la anterior
+  // const recover_at = new Date(baseTime.getTime() + 5 * 60 * 1000);
+  const recover_at = new Date(baseTime.getTime() + 1 * 60 * 1000); // 1 minuto
+
+  const [updatedUser] = await prisma.$transaction([
+    UserModel.update({
+      where: { id },
+      data: { hearts: newHearts },
+    }),
+    heart_recoveryModel.create({
+      data: {
+        user_id: id,
+        recover_at,
+      },
+    }),
+  ]);
 
   return updatedUser;
+};
+
+
+export const getHeartsPendingService = async (userId: number) => {
+  const now = new Date();
+
+  const recoveries = await heart_recoveryModel.findMany({
+    where: {
+      user_id: userId,
+      recover_at: { gt: now },
+    },
+    orderBy: { recover_at: "asc" },
+  });
+
+  return {
+    heartsPending: recoveries.length,
+    recoveries: recoveries.map((r) => r.recover_at),
+  };
 };

@@ -27,3 +27,5 @@ export const DailyUserStats = prisma.daily_user_stats;
 export const GeneralStatsModel = prisma.user_general_stats;            
 export const UserUnitProgressModel = prisma.unit_progress;            
 
+//tabla para ver las vidas
+export const heart_recoveryModel = prisma.heart_recovery; // vidas
