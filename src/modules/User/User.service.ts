@@ -156,8 +156,8 @@ export const ReducerliveService = async (id: number) => {
   const baseTime = lastRecovery ? new Date(lastRecovery.recover_at) : new Date();
 
   // Nueva recuperación programada exactamente +5 minutos después de la anterior
-  // const recover_at = new Date(baseTime.getTime() + 5 * 60 * 1000);
-  const recover_at = new Date(baseTime.getTime() + 1 * 60 * 1000); // 1 minuto
+   const recover_at = new Date(baseTime.getTime() + 5 * 60 * 1000);
+  //const recover_at = new Date(baseTime.getTime() + 1 * 60 * 1000); // 1 minuto
 
   const [updatedUser] = await prisma.$transaction([
     UserModel.update({
