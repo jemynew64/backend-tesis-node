@@ -1,5 +1,11 @@
 import { EarnedAchievementModel, AchievementModel, GeneralStatsModel } from "../../database/prismaClient";
 import { EarnedAchievementSchema, EarnedAchievementFormType } from "../../schemas/index";
+type EarnedAchievement = {
+  id: number;
+  user_id: number;
+  obtained_at: Date;
+  achievement_id: number;
+};
 
 // ✅ Tipo usado para crear logros (sin `id`)
 type EarnedAchievementCreateInput = Omit<EarnedAchievementFormType, "id">;
@@ -74,7 +80,7 @@ export const autoAssignAchievements = async (userId: number) => {
       throw new Error("User stats not found");
     }
 
-    const logrosYaGanados = new Set(logrosGanados.map((l) => l.achievement_id));
+    const logrosYaGanados = new Set(logrosGanados.map((l:EarnedAchievement) => l.achievement_id));
 
     // ✅ Aquí el cambio importante
     const nuevosLogros: any[] = []; // O tipa correctamente si tienes el tipo exacto
