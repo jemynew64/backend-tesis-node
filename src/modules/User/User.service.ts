@@ -1,6 +1,11 @@
 import { UserModel, UserProgressModel,CourseModel,prisma ,heart_recoveryModel  } from "../../database/prismaClient";
 import { UserSchema, UserType } from "./UserSchema";
 import { hashPassword } from "../../utils/hashPassword";
+type HeartRecovery = {
+  id: number;
+  user_id: number;
+  recover_at: Date;
+};
 
 // Get all users with pagination
 export const getUsersService = async (page: number, limit: number) => {
@@ -45,7 +50,7 @@ export const getUserByIdService = async (id: number) => {
       heart_recoveryModel.deleteMany({
         where: {
           id: {
-            in: toRestore.map(h => h.id),
+          in: toRestore.map((h: HeartRecovery) => h.id),
           },
         },
       }),
@@ -189,6 +194,6 @@ export const getHeartsPendingService = async (userId: number) => {
 
   return {
     heartsPending: recoveries.length,
-    recoveries: recoveries.map((r) => r.recover_at),
+    recoveries: recoveries.map((r:HeartRecovery) => r.recover_at),
   };
 };

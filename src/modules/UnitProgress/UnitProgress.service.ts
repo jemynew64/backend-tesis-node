@@ -4,6 +4,13 @@ import {
   GeneralStatsModel,
 } from "../../database/prismaClient";
 
+type LessonWithProgressSimple = {
+  id: number;
+  lesson_progress: {
+    completed: boolean;
+  }[];
+};
+
 export const updateCompletedUnitsByUser = async (
   courseId: number,
   userId: number
@@ -32,7 +39,7 @@ export const updateCompletedUnitsByUser = async (
 
   for (const unit of course.unit) {
     const allLessonsCompleted = unit.lesson.every(
-      (lesson) => lesson.lesson_progress?.[0]?.completed === true
+      (lesson:LessonWithProgressSimple) => lesson.lesson_progress?.[0]?.completed === true
     );
 
     if (allLessonsCompleted) {

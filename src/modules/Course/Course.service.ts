@@ -1,6 +1,30 @@
 import { CourseModel  } from "../../database/prismaClient";
 import { CourseSchema, CourseType } from "./CourseSchema";
 
+export type LessonWithProgress = {
+  id: number;
+  title: string;
+  order_num: number;
+  lesson_progress: {
+    completed: boolean;
+  }[];
+};
+export type UnitWithLessonsAndProgress = {
+  id: number;
+  title: string;
+  order_num: number;
+  description: string;
+  lesson: {
+    id: number;
+    title: string;
+    order_num: number;
+    lesson_progress: {
+      completed: boolean;
+    }[];
+  }[];
+};
+
+
 export const findAllCourses = async (page: number, limit: number) => {
   return await CourseModel.findMany({
     take: limit,
@@ -95,14 +119,14 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
 
   const courseWithStatus = {
     title: course.title,
-    unit: course.unit.map((unit, unitIndex, allUnits) => {
+    unit: course.unit.map((unit:UnitWithLessonsAndProgress, unitIndex:number, allUnits:UnitWithLessonsAndProgress[]) => {
       const isFirstUnit = unitIndex === 0;
 
       const previousUnitCompleted = isFirstUnit || allUnits[unitIndex - 1].lesson.every(
-        (l) => l.lesson_progress?.[0]?.completed === true
+        (l:LessonWithProgress) => l.lesson_progress?.[0]?.completed === true
       );
 
-      const lessonWithStatus = unit.lesson.map((lesson, lessonIndex, lessonArray) => {
+      const lessonWithStatus = unit.lesson.map((lesson:LessonWithProgress, lessonIndex:number, lessonArray:LessonWithProgress[]) => {
         const isFirstLesson = lessonIndex === 0;
         const Eslaultimaleccion = lessonIndex === lessonArray.length - 1;
 

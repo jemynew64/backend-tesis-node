@@ -1,5 +1,8 @@
 import { EarnedAchievementModel, AchievementModel, GeneralStatsModel } from "../../database/prismaClient";
-import { EarnedAchievementSchema, EarnedAchievementType } from "../../schemas/index";
+import { EarnedAchievementSchema, EarnedAchievementFormType } from "../../schemas/index";
+
+// ✅ Tipo usado para crear logros (sin `id`)
+type EarnedAchievementCreateInput = Omit<EarnedAchievementFormType, "id">;
 
 // Obtener logros ganados con paginación
 export const fetchEarnedAchievements = async (page = 1, limit = 10) => {
@@ -17,17 +20,20 @@ export const fetchEarnedAchievementById = async (id: number) => {
 };
 
 // Crear un nuevo logro ganado
-export const createNewEarnedAchievement = async (data: EarnedAchievementType) => {
+export const createNewEarnedAchievement = async (data: EarnedAchievementCreateInput) => {
   const validatedData = EarnedAchievementSchema.parse(data);
+
   const exists = await EarnedAchievementModel.findFirst({
     where: {
       achievement_id: validatedData.achievement_id,
       user_id: validatedData.user_id,
     },
   });
+
   if (exists) {
     throw new Error("Este usuario ya ha obtenido este logro.");
   }
+
   return await EarnedAchievementModel.create({
     data: validatedData,
   });
@@ -43,7 +49,7 @@ export const removeEarnedAchievementById = async (id: number) => {
 // Actualizar logro ganado por ID
 export const modifyEarnedAchievementById = async (
   id: number,
-  data: Partial<EarnedAchievementType>
+  data: Partial<EarnedAchievementFormType>
 ) => {
   const validatedData = EarnedAchievementSchema.partial().parse(data);
   return await EarnedAchievementModel.update({
@@ -52,6 +58,7 @@ export const modifyEarnedAchievementById = async (
   });
 };
 
+// Asignación automática de logros si se cumplen condiciones
 export const autoAssignAchievements = async (userId: number) => {
   try {
     console.log("🔍 Iniciando comprobación de logros para usuario:", userId);
@@ -67,8 +74,10 @@ export const autoAssignAchievements = async (userId: number) => {
       throw new Error("User stats not found");
     }
 
-    const logrosYaGanados = new Set(logrosGanados.map((l:EarnedAchievementType) => l.achievement_id));
-    const nuevosLogros = [];
+    const logrosYaGanados = new Set(logrosGanados.map((l) => l.achievement_id));
+
+    // ✅ Aquí el cambio importante
+    const nuevosLogros: any[] = []; // O tipa correctamente si tienes el tipo exacto
 
     for (const logro of logros) {
       if (logrosYaGanados.has(logro.id)) continue;
@@ -91,16 +100,17 @@ export const autoAssignAchievements = async (userId: number) => {
           continue;
       }
 
-
       if (cumple) {
         const nuevo = await EarnedAchievementModel.create({
           data: {
             user_id: userId,
             achievement_id: logro.id,
+            obtained_at: new Date(),
           },
         });
+
         console.log(`🏆 Logro asignado: ${logro.title} (ID: ${logro.id})`);
-        nuevosLogros.push(nuevo);
+        nuevosLogros.push(nuevo); // ✅ ya no da error aquí
       }
     }
 
