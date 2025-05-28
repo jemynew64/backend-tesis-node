@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService,ReducerliveService,getHeartsPendingService  } from "./User.service";
+import { createUserService, getUsersService, getUserByIdService, deleteUserService, updateUserService,ReducerliveService,getHeartsPendingService ,updateProfileImageService } from "./User.service";
 import { handleErrorResponse } from "../../utils/errorHandler";
 
 // Get all users with pagination
@@ -80,6 +80,24 @@ export const getHeartsPendingHandler = async (req: Request, res: Response) => {
     const userIdFromToken = (req as any).user?.id;
     const data = await getHeartsPendingService(userIdFromToken);
     res.status(200).json(data);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+// Actualizar solo la imagen de perfil
+export const updateProfileImageHandler = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { profile_image } = req.body;
+
+    if (!profile_image) {
+       res.status(400).json({ message: "Profile image URL is required." });
+       return;
+    }
+
+    const updatedUser = await updateProfileImageService(Number(userId), profile_image);
+    res.status(200).json(updatedUser);
   } catch (error) {
     handleErrorResponse(res, error);
   }

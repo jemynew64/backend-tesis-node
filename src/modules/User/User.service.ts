@@ -197,3 +197,16 @@ export const getHeartsPendingService = async (userId: number) => {
     recoveries: recoveries.map((r:HeartRecovery) => r.recover_at),
   };
 };
+
+// Servicio específico para actualizar solo la imagen de perfil
+export const updateProfileImageService = async (id: number, newProfileImage: string) => {
+  const existingUser = await UserModel.findUnique({ where: { id } });
+  if (!existingUser) throw new Error("User not found");
+
+  const updatedUser = await UserModel.update({
+    where: { id },
+    data: { profile_image: newProfileImage },
+  });
+
+  return updatedUser;
+};
