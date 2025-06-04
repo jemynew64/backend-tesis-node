@@ -1,5 +1,6 @@
 import { prisma } from "../../database/prismaClient";
 import PDFDocument from "pdfkit";
+import axios from "axios";
 
 export interface DailyUserStat {
   id: number;
@@ -58,12 +59,15 @@ export const generateUserReportPDF = async (
 
   const doc = new PDFDocument({ size: "A4", margin: 50 });
   const buffers: Uint8Array[] = [];
+  const logoUrl = "https://res.cloudinary.com/dkbydlqen/image/upload/v1748983331/iconodemarca-sinfondo_vahgnz.png";
+  const response = await axios.get<ArrayBuffer>(logoUrl, { responseType: "arraybuffer" });
+  const buffer = Buffer.from(new Uint8Array(response.data));
 
   doc.on("data", (chunk: Uint8Array) => buffers.push(chunk));
   doc.on("end", () => {});
 
   // Header
-  doc.image("src/modules/Pdf/logo.png", 450, 30, { width: 80 }) // Puedes usar local si prefieres
+  doc.image(buffer, 450, 30, { width: 80 }) // Puedes usar local si prefieres
     .fillColor("#4A00E0")
     .fontSize(20)
     .text("GENIOS EN ACCIÓN - REPORTE DE PROGRESO", 50, 50, {
