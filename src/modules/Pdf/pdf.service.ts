@@ -1,4 +1,5 @@
 import { prisma } from "../../database/prismaClient";
+import PDFDocument from "pdfkit";
 
 export interface DailyUserStat {
   id: number;
@@ -38,8 +39,6 @@ export const generateUserReportPDF = async (
   from: string,
   to: string
 ): Promise<Uint8Array> => {
-  const isProd = process.env.NODE_ENV === "production";
-
   const user = await prisma.user_account.findUnique({
     where: { id: userId },
     include: {
@@ -57,136 +56,72 @@ export const generateUserReportPDF = async (
   const dailyStats = user.daily_user_stats;
   const achievements = user.earned_achievement;
 
-  const htmlContent = `
-  <html>
-  <head>
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding: 40px;
-        background: #f5f5fc;
-        color: #333;
-      }
-      .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 40px;
-      }
-      .logo { width: 90px; height: auto; }
-      h1 {
-        font-size: 24px;
-        color: #4A00E0;
-        text-align: left;
-        max-width: 80%;
-      }
-      .card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-        padding: 24px;
-        margin-bottom: 30px;
-      }
-      .card h3 {
-        font-size: 18px;
-        color: #4A00E0;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 6px;
-      }
-      .card ul {
-        list-style-type: disc;
-        padding-left: 20px;
-        margin-top: 10px;
-      }
-      .card li { margin-bottom: 6px; font-size: 14px; }
-      .card strong { color: #333; }
-      .info-line { margin-bottom: 8px; font-size: 14px; }
-      .footer {
-        text-align: center;
-        font-size: 12px;
-        color: #777;
-        margin-top: 40px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <h1>GENIOS EN ACCIÓN - REPORTE DE PROGRESO</h1>
-      <img src="https://res.cloudinary.com/dkbydlqen/image/upload/v1748983331/iconodemarca-sinfondo_vahgnz.png" class="logo" />
-    </div>
+  const doc = new PDFDocument({ size: "A4", margin: 50 });
+  const buffers: Uint8Array[] = [];
 
-    <div class="card">
-      <h3>Datos generales</h3>
-      <div class="info-line"><strong>Usuario:</strong> ${user.name}</div>
-      <div class="info-line"><strong>Correo:</strong> ${user.email}</div>
-      <div class="info-line"><strong>Nivel actual:</strong> ${user.level} (${user.experience} EXP)</div>
-      <div class="info-line"><strong>Corazones restantes:</strong> ${user.hearts}</div>
-      <div class="info-line"><strong>Periodo evaluado:</strong> ${from} - ${to}</div>
-    </div>
+  doc.on("data", (chunk: Uint8Array) => buffers.push(chunk));
+  doc.on("end", () => {});
 
-    <div class="card">
-      <h3>Resumen general</h3>
-      <ul>
-        <li>Lecciones completadas: ${stats?.total_lessons ?? 0}</li>
-        <li>Lecciones perfectas: ${stats?.total_lessons_perfect ?? 0}</li>
-        <li>Retos completados: ${stats?.total_challenges ?? 0}</li>
-        <li>Quizzes completados: ${stats?.quizzes_completed ?? 0}</li>
-        <li>Tiempo dedicado en el periodo: ${
-          dailyStats.reduce((a: number, d: DailyUserStat) => a + d.time_spent_minutes, 0)
-        } minutos</li>
-        <li>Experiencia total: ${stats?.total_experience ?? 0}</li>
-        <li>Puntos totales: ${stats?.total_points ?? 0}</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3>Logros alcanzados</h3>
-      <ul>
-        ${achievements.map(
-          (e: EarnedAchievement) =>
-            `<li><strong>${e.achievement.title}:</strong> ${e.achievement.description}</li>`
-        ).join("")}
-      </ul>
-    </div>
-
-    <div class="footer">
-      Reporte generado automáticamente por el sistema <strong>Genios en Acción</strong>
-    </div>
-  </body>
-  </html>
-  `;
-
-  let puppeteer: any;
-  let browser: any;
-
-  if (isProd) {
-    const puppeteerModule = await import("puppeteer-core");
-    const chromium = (await import("@sparticuz/chromium")).default;
-    puppeteer = puppeteerModule.default;
-
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath(),
-      headless: true,
-      defaultViewport: chromium.defaultViewport,
+  // Header
+  doc.image("src/modules/Pdf/logo.png", 450, 30, { width: 80 }) // Puedes usar local si prefieres
+    .fillColor("#4A00E0")
+    .fontSize(20)
+    .text("GENIOS EN ACCIÓN - REPORTE DE PROGRESO", 50, 50, {
+      width: 400,
+      align: "left",
     });
-  } else {
-    const puppeteerModule = await import("puppeteer");
-    puppeteer = puppeteerModule.default;
 
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  doc.moveDown();
+
+  // Sección: Datos generales
+  doc.fillColor("#000").fontSize(14).text("Datos generales", { underline: true });
+  doc.moveDown(0.5);
+  doc.fontSize(12)
+    .text(`Usuario: ${user.name}`)
+    .text(`Correo: ${user.email}`)
+    .text(`Nivel actual: ${user.level} (${user.experience} EXP)`)
+    .text(`Corazones restantes: ${user.hearts}`)
+    .text(`Periodo evaluado: ${from} a ${to}`);
+
+  doc.moveDown();
+
+  // Sección: Resumen general
+  doc.fillColor("#000").fontSize(14).text("Resumen general", { underline: true });
+  doc.moveDown(0.5);
+  doc.fontSize(12)
+    .text(`Lecciones completadas: ${stats?.total_lessons ?? 0}`)
+    .text(`Lecciones perfectas: ${stats?.total_lessons_perfect ?? 0}`)
+    .text(`Retos completados: ${stats?.total_challenges ?? 0}`)
+    .text(`Quizzes completados: ${stats?.quizzes_completed ?? 0}`)
+    .text(`Tiempo dedicado en el periodo: ${
+      dailyStats.reduce((a: number, d: DailyUserStat) => a + d.time_spent_minutes, 0)
+    } minutos`)
+    .text(`Experiencia total: ${stats?.total_experience ?? 0}`)
+    .text(`Puntos totales: ${stats?.total_points ?? 0}`);
+
+  doc.moveDown();
+
+  // Sección: Logros
+  doc.fillColor("#000").fontSize(14).text("Logros alcanzados", { underline: true });
+  doc.moveDown(0.5);
+  achievements.forEach((e: EarnedAchievement) => {
+    doc.fontSize(12).text(`• ${e.achievement.title}: ${e.achievement.description}`);
+  });
+
+  doc.moveDown(2);
+
+  doc.fontSize(10).fillColor("#777").text(
+    "Reporte generado automáticamente por el sistema Genios en Acción",
+    { align: "center" }
+  );
+
+  doc.end();
+
+  return new Promise((resolve, reject) => {
+    doc.on("end", () => {
+      const pdfBuffer = Buffer.concat(buffers);
+      resolve(new Uint8Array(pdfBuffer));
     });
-  }
-
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-  const pdfBuffer = await page.pdf({ format: "A4" });
-  await browser.close();
-
-  console.log("Tamaño del PDF generado:", pdfBuffer.length);
-  return pdfBuffer;
+    doc.on("error", reject);
+  });
 };
