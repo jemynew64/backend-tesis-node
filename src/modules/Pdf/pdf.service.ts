@@ -196,10 +196,23 @@ export const generateUserReportPDF = async (
 </html>
 `;
 
-const browser = await puppeteer.launch({
-  headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-});
+  let browser;
+
+  if (process.env.NODE_ENV === "production") {
+    const chromium = await import("@sparticuz/chromium");
+    browser = await puppeteer.launch({
+      args: chromium.default.args,
+      defaultViewport: chromium.default.defaultViewport,
+      executablePath: await chromium.default.executablePath(),
+      headless: chromium.default.headless,
+    });
+  } else {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+  }
+
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
   const pdfBuffer = await page.pdf({ format: "A4" });
