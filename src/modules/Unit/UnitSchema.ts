@@ -6,6 +6,11 @@ export const UnitSchema = z.object({
   description: z.string(),
   order_num: z.number().min(1, "El orden debe ser un número positivo"),
   course_id: z.number().min(1, "Debe referenciar un curso válido"),
+  color: z.enum([
+    "red", "orange", "amber", "yellow", "lime", "green", "emerald",
+    "teal", "cyan", "sky", "blue", "indigo", "violet", "purple",
+    "fuchsia", "pink", "rose", "slate", "gray", "zinc", "neutral", "stone"
+  ]).default("green"), // campo opcional con valor por defecto
 });
 
 export type UnitType = z.infer<typeof UnitSchema>;

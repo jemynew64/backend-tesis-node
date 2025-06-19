@@ -14,6 +14,7 @@ export type UnitWithLessonsAndProgress = {
   title: string;
   order_num: number;
   description: string;
+  color: string; 
   lesson: {
     id: number;
     title: string;
@@ -98,6 +99,7 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
           title: true,
           description: true,
           order_num: true,
+          color: true,
           lesson: {
             orderBy: { order_num: "asc" },
             select: {
@@ -150,6 +152,7 @@ export const courseWithUnlockedLessons = async (courseId: number, userId: number
         id: unit.id,
         title: unit.title,
         description: unit.description,
+        color: unit.color,
         lesson: lessonWithStatus,
       };
     }),
