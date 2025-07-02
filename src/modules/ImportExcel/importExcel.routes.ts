@@ -1,7 +1,7 @@
 // src/modules/ImportExcel/importExcel.routes.ts
 import express from "express";
 import multer from "multer";
-import { handleExcelUpload } from "./importExcel.controller";
+import { handleExcelUpload,handleUserExcelUpload } from "./importExcel.controller";
 
 const router = express.Router();
 
@@ -9,5 +9,6 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/unidad-completa", upload.single("file"), handleExcelUpload);
+router.post("/usuarios-masivos", upload.single("file"), handleUserExcelUpload);
 
 export default router;
